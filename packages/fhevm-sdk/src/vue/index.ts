@@ -1,7 +1,7 @@
 /**
- * React Adapter - FHEVM SDK React Integration
+ * Vue Adapter - FHEVM SDK Vue Integration
  *
- * Import path: @fhevm-sdk/react
+ * Import path: @fhevm-sdk/vue
  */
 
 // Re-export core functionality (selective to avoid conflicts)
@@ -47,17 +47,11 @@ export {
   type ExactPartial,
 } from '../exports/core.js'
 
-// Context and Provider
-export { FhevmContext, FhevmProvider, type FhevmProviderProps } from './context.js'
+// Plugin
+export { FhevmPlugin, fhevmConfigKey, type FhevmPluginOptions } from './plugin.js'
 
-// Hooks - New Pattern (Wagmi-inspired, thin wrappers calling core actions)
+// Composables
 export { useConfig, type UseConfigParameters, type UseConfigReturnType } from './useConfig.js'
 export { useFhevmInstance, type UseFhevmInstanceParameters, type UseFhevmInstanceReturnType } from './useFhevmInstance.js'
 export { useEncrypt, type UseEncryptParameters, type UseEncryptReturnType } from './useEncrypt.js'
 export { useDecrypt, type UseDecryptParameters, type UseDecryptReturnType } from './useDecrypt.js'
-
-// Legacy hooks (old pattern - kept for backward compatibility, will be deprecated)
-export { useFhevm, type FhevmGoState } from "./useFhevm.js";
-export { useFHEEncryption } from "./useFHEEncryption.js";
-export { useFHEDecrypt } from "./useFHEDecrypt.js";
-export { useInMemoryStorage } from "./useInMemoryStorage.js";
