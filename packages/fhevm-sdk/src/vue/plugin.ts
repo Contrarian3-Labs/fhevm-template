@@ -55,7 +55,12 @@ export const FhevmPlugin = {
     const { onMount } = hydrate(config, { ...options, autoConnect })
 
     // Execute onMount immediately for Vue (no SSR support in this version)
-    // TODO: Add proper SSR support with Vue SSR lifecycle hooks
+    // Note: Vue SSR support is intentionally deferred to v1.0.
+    // Current implementation works for client-side Vue apps (SPA, CSR).
+    // For Vue SSR (Nuxt), users should:
+    // 1. Use mock chains (works in Node.js)
+    // 2. Initialize config in onMounted() hook (client-side only)
+    // 3. Set ssr: false in createFhevmConfig()
     onMount()
   },
 } satisfies Plugin<FhevmPluginOptions>

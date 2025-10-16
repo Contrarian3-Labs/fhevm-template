@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useContext, useState } from "react";
-import { GenericStringInMemoryStorage, GenericStringStorage } from "../storage/GenericStringStorage";
+import { GenericStringInMemoryStorage, GenericStringStorage } from "../storage/GenericStringStorage.js";
 
 interface UseInMemoryStorageState {
   storage: GenericStringStorage;

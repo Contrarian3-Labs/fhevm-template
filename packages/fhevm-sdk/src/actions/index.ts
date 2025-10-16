@@ -32,3 +32,9 @@ export {
   type DecryptParameters,
   type DecryptReturnType,
 } from './decrypt.js'
+
+export {
+  publicDecrypt,
+  type PublicDecryptParameters,
+  type PublicDecryptReturnType,
+} from './publicDecrypt.js'

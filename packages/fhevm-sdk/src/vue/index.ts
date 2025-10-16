@@ -39,6 +39,9 @@ export {
   type DecryptRequest,
   type DecryptParameters,
   type DecryptReturnType,
+  publicDecrypt,
+  type PublicDecryptParameters,
+  type PublicDecryptReturnType,
   // Types
   type FhevmInstance,
   type FhevmInstanceConfig,
@@ -55,3 +58,4 @@ export { useConfig, type UseConfigParameters, type UseConfigReturnType } from '.
 export { useFhevmInstance, type UseFhevmInstanceParameters, type UseFhevmInstanceReturnType } from './useFhevmInstance.js'
 export { useEncrypt, type UseEncryptParameters, type UseEncryptReturnType } from './useEncrypt.js'
 export { useDecrypt, type UseDecryptParameters, type UseDecryptReturnType } from './useDecrypt.js'
+export { usePublicDecrypt, type UsePublicDecryptParameters, type UsePublicDecryptReturnType } from './usePublicDecrypt.js'

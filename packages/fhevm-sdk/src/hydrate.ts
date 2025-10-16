@@ -56,12 +56,10 @@ export function hydrate(config: FhevmConfig, parameters: HydrateParameters) {
       }
 
       // Auto-connect if enabled
-      if (autoConnect && config.autoConnect) {
-        // TODO: Implement auto-connect logic
-        // This would attempt to create an instance automatically
-        // Similar to Wagmi's reconnect behavior
-        console.log('[hydrate] Auto-connect not yet implemented')
-      }
+      // Note: Auto-connect behavior is intentionally not implemented in core.
+      // Framework adapters (React/Vue) should handle auto-connection at the component level
+      // using their respective lifecycle hooks (useEffect/onMounted) with createInstance().
+      // This follows Wagmi's pattern where reconnection is handled by framework-specific hooks.
     },
   }
 }

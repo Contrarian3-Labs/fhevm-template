@@ -39,6 +39,9 @@ export {
   type DecryptRequest,
   type DecryptParameters,
   type DecryptReturnType,
+  publicDecrypt,
+  type PublicDecryptParameters,
+  type PublicDecryptReturnType,
   // Types
   type FhevmInstance,
   type FhevmInstanceConfig,
@@ -55,9 +58,10 @@ export { useConfig, type UseConfigParameters, type UseConfigReturnType } from '.
 export { useFhevmInstance, type UseFhevmInstanceParameters, type UseFhevmInstanceReturnType } from './useFhevmInstance.js'
 export { useEncrypt, type UseEncryptParameters, type UseEncryptReturnType } from './useEncrypt.js'
 export { useDecrypt, type UseDecryptParameters, type UseDecryptReturnType } from './useDecrypt.js'
+export { usePublicDecrypt, type UsePublicDecryptParameters, type UsePublicDecryptReturnType } from './usePublicDecrypt.js'
 
 // Legacy hooks (old pattern - kept for backward compatibility, will be deprecated)
 export { useFhevm, type FhevmGoState } from "./useFhevm.js";
 export { useFHEEncryption } from "./useFHEEncryption.js";
 export { useFHEDecrypt } from "./useFHEDecrypt.js";
-export { useInMemoryStorage } from "./useInMemoryStorage.js";
+export { useInMemoryStorage, InMemoryStorageProvider } from "./useInMemoryStorage.js";

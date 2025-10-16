@@ -1,9 +1,32 @@
 /**
- * decrypt Action
+ * @fileoverview FHEVM decryption action following Wagmi's action pattern.
  *
- * Pure function for decrypting FHEVM ciphertext handles
- * Extracted from react/useFHEDecrypt.ts (lines 56-123 - 67 lines of business logic)
- * Following Wagmi action pattern: (config, parameters) => Promise<Result>
+ * Provides framework-agnostic decryption of FHEVM ciphertext handles using EIP-712 signatures.
+ * Extracted from React hook (useFHEDecrypt.ts:56-123) to separate business logic from UI concerns.
+ *
+ * **Architecture:**
+ * ```
+ * decrypt(config, params)
+ * ├── Validate handles (format, length)
+ * ├── Load/create EIP-712 signature (cached in storage)
+ * ├── Validate signature (expiry, contract coverage)
+ * └── Call instance.userDecrypt() with signature
+ * ```
+ *
+ * **Security Model:**
+ * - Uses EIP-712 typed signatures for user authorization
+ * - Signatures are cached in storage (default: 7 days validity)
+ * - Each signature is scoped to specific contract addresses
+ * - Expired signatures are automatically rejected
+ *
+ * **Error Handling:**
+ * Follows Wagmi's connect.ts pattern (wagmi/core/src/actions/connect.ts:50-85):
+ * - Update config state with error
+ * - Re-throw original error (no wrapping)
+ * - Let caller handle error presentation
+ *
+ * @module actions/decrypt
+ * @see {@link https://github.com/wevm/wagmi/blob/main/packages/core/src/actions/connect.ts Wagmi connect action}
  */
 
 import type { FhevmConfig } from '../createConfig.js'
@@ -36,29 +59,88 @@ export type DecryptReturnType = Record<string, string | bigint | boolean>
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Decrypts FHEVM ciphertext handles using user's signature
+ * Decrypts FHEVM ciphertext handles using EIP-712 signature authorization.
  *
- * @param config - FHEVM configuration object
+ * This is the core decryption action, following Wagmi's action pattern (config, params) => Promise<Result>.
+ * Handles signature caching, validation, and batch decryption of multiple handles.
+ *
+ * **Security Flow:**
+ * 1. Load cached signature from storage OR prompt user to sign EIP-712 message
+ * 2. Validate signature hasn't expired (default: 7 days)
+ * 3. Validate signature covers all requested contract addresses
+ * 4. Call FHEVM userDecrypt with signature proof
+ *
+ * **Signature Caching:**
+ * Signatures are cached per (userAddress, contractAddresses) combination to avoid
+ * repeated wallet prompts. Cache key format: `fhevm-sig-${userAddress}-${sortedAddresses}`.
+ *
+ * **Handle Validation:**
+ * - Must be hex string starting with 0x
+ * - Expected length: 66 characters (0x + 64 hex chars)
+ * - Must contain only valid hex characters [0-9a-fA-F]
+ *
+ * @template config - FHEVM configuration type
+ *
+ * @param config - FHEVM configuration object from createFhevmConfig()
  * @param parameters - Decryption parameters
- * @returns Promise resolving to decrypted values mapped by handle
+ * @param parameters.instance - FhevmInstance for cryptographic operations
+ * @param parameters.requests - Array of {handle, contractAddress} pairs to decrypt
+ * @param parameters.signer - Ethers JsonRpcSigner for EIP-712 signature
+ * @param parameters.storage - Storage backend for signature caching (e.g., localStorage)
+ * @param parameters.chainId - Optional chain ID for validation
+ *
+ * @returns Promise<Record<handle, decryptedValue>> - Map of handles to decrypted values (bigint | boolean | string)
+ *
+ * @throws {Error} SIGNATURE_ERROR - Failed to create or load signature
+ * @throws {Error} SIGNATURE_EXPIRED - Cached signature has expired
+ * @throws {Error} SIGNATURE_MISMATCH - Signature doesn't cover all requested contracts
+ * @throws {Error} Invalid handle - Handle format validation failed
+ * @throws {Error} Propagates userDecrypt errors (network, cryptographic failures)
  *
  * @example
- * ```ts
+ * // Basic usage with single handle
  * const config = createFhevmConfig({ chains: [31337] })
  * const instance = await createInstance(config, { provider })
  *
  * const decrypted = await decrypt(config, {
  *   instance,
  *   requests: [
- *     { handle: '0x...', contractAddress: '0x...' },
- *     { handle: '0x...', contractAddress: '0x...' },
+ *     { handle: '0x1234...', contractAddress: '0xabcd...' }
  *   ],
  *   signer: await provider.getSigner(),
  *   storage: config.storage,
  * })
+ * console.log(decrypted['0x1234...']) // 42n (bigint) or true (boolean)
  *
- * console.log(decrypted['0x...']) // 42 or true or "value"
- * ```
+ * @example
+ * // Batch decryption from multiple contracts
+ * const decrypted = await decrypt(config, {
+ *   instance,
+ *   requests: [
+ *     { handle: '0xaaa...', contractAddress: '0xContract1...' },
+ *     { handle: '0xbbb...', contractAddress: '0xContract1...' },
+ *     { handle: '0xccc...', contractAddress: '0xContract2...' },
+ *   ],
+ *   signer,
+ *   storage: config.storage,
+ * })
+ * // User signs ONCE for both contracts (signature cached for 7 days)
+ *
+ * @example
+ * // Error handling (Wagmi pattern)
+ * try {
+ *   const decrypted = await decrypt(config, { ... })
+ * } catch (error) {
+ *   // Config state already updated with error
+ *   // Original error is thrown (no wrapping)
+ *   if (error.message.includes('SIGNATURE_EXPIRED')) {
+ *     // Clear cache and retry
+ *   }
+ * }
+ *
+ * @see {@link https://github.com/wevm/wagmi/blob/main/packages/core/src/actions/connect.ts#L50-L85 Wagmi connect error handling}
+ * @see {@link FhevmDecryptionSignature} for signature lifecycle management
+ * @see {@link getDecryptionSignature} for signature creation without decryption
  */
 export async function decrypt<config extends FhevmConfig>(
   config: config,
@@ -135,59 +217,87 @@ export async function decrypt<config extends FhevmConfig>(
       contractAddress: r.contractAddress,
     }))
 
-    let results: Record<string, string | bigint | boolean> = {}
-
-    try {
-      results = await instance.userDecrypt(
-        mutableReqs,
-        sig.privateKey,
-        sig.publicKey,
-        sig.signature,
-        sig.contractAddresses,
-        sig.userAddress,
-        sig.startTimestamp,
-        sig.durationDays
-      )
-    } catch (e) {
-      const err = e as unknown as { name?: string; message?: string }
-      const code =
-        err && typeof err === 'object' && 'name' in err
-          ? (err as any).name
-          : 'DECRYPT_ERROR'
-      const msg =
-        err && typeof err === 'object' && 'message' in err
-          ? (err as any).message
-          : 'Decryption failed'
-
-      throw new Error(`${code}: ${msg}`)
-    }
+    // Call FHEVM userDecrypt - errors propagate naturally (no wrapping)
+    const results = await instance.userDecrypt(
+      mutableReqs,
+      sig.privateKey,
+      sig.publicKey,
+      sig.signature,
+      sig.contractAddresses,
+      sig.userAddress,
+      sig.startTimestamp,
+      sig.durationDays
+    )
 
     return results
   } catch (error) {
-    const err = error as Error
-    throw new Error(
-      `FHEVM_DECRYPT_ERROR: ${err.message}`,
-      { cause: error }
-    )
+    /**
+     * Wagmi error handling pattern (wagmi/core/src/actions/connect.ts:76-85):
+     * 1. Update config state with error (enables reactive UI updates)
+     * 2. Re-throw original error (no wrapping, preserves stack trace)
+     * 3. Let caller handle presentation (toast, alert, etc.)
+     *
+     * WHY no error wrapping:
+     * - Preserves original error type for instanceof checks
+     * - Keeps stack trace intact for debugging
+     * - Avoids "Error: Error: Error:" nesting
+     * - Framework hooks can access both config.state.error (reactive) and caught error (immediate)
+     */
+    config.setState((state) => ({
+      ...state,
+      status: 'error',
+      error: error as Error,
+    }))
+
+    // Re-throw original error unchanged
+    throw error
   }
 }
 
 /**
- * Get or create a decryption signature for specified contract addresses
+ * Get or create an EIP-712 decryption signature without performing decryption.
+ *
+ * Useful for pre-warming signature cache or manually managing signature lifecycle.
+ * Most users should use decrypt() which handles signatures automatically.
+ *
+ * **Use Cases:**
+ * - Pre-fetch signature before user needs decryption (reduce latency)
+ * - Check if signature exists in cache (avoid wallet prompt)
+ * - Manually refresh expired signature
+ *
+ * @template config - FHEVM configuration type
  *
  * @param config - FHEVM configuration object
  * @param parameters - Signature parameters
- * @returns Promise resolving to FhevmDecryptionSignature or null
+ * @param parameters.instance - FhevmInstance for signature generation
+ * @param parameters.contractAddresses - Contract addresses to authorize in signature
+ * @param parameters.signer - Ethers JsonRpcSigner for EIP-712 signing
+ * @param parameters.storage - Storage backend for caching
+ *
+ * @returns Promise<FhevmDecryptionSignature | null> - Signature object or null if signing failed
+ *
+ * @throws {Error} Propagates signature creation errors from EIP-712 signing
  *
  * @example
- * ```ts
- * const signature = await getDecryptionSignature(config, {
- *   instance,
- *   contractAddresses: ['0x...', '0x...'],
- *   signer: await provider.getSigner(),
- *   storage: config.storage,
- * })
- * ```
+ * // Pre-warm signature cache on page load
+ * useEffect(() => {
+ *   getDecryptionSignature(config, {
+ *     instance,
+ *     contractAddresses: ['0xMyContract...'],
+ *     signer,
+ *     storage: config.storage,
+ *   })
+ * }, [])
+ *
+ * @example
+ * // Check signature existence without triggering wallet
+ * const sig = await getDecryptionSignature(config, { ... })
+ * if (!sig || !sig.isValid()) {
+ *   console.log('Need to request new signature')
+ * }
+ *
+ * @see {@link FhevmDecryptionSignature.loadOrSign} for underlying implementation
+ * @see {@link decrypt} for automatic signature management with decryption
  */
 export async function getDecryptionSignature<config extends FhevmConfig>(
   config: config,
