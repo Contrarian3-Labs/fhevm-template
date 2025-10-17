@@ -20,6 +20,8 @@ const generatedContractComment = `
 const DEPLOYMENTS_DIR = "./packages/hardhat/deployments";
 const ARTIFACTS_DIR = "./packages/hardhat/artifacts";
 const TARGET_DIR = "./packages/nextjs/contracts/";
+const VUE_TARGET_DIR = "./packages/vue-example/src/contracts/";
+const NODEJS_TARGET_DIR = "./packages/nodejs-example/src/contracts/";
 
 function getDirectories(path: string) {
   return fs
@@ -106,12 +108,82 @@ function getContractDataFromDeployments() {
 }
 
 /**
+ * Generates contract config for Vue example
+ */
+async function generateVueConfig(allContractsData: Record<string, any>) {
+  if (!fs.existsSync(VUE_TARGET_DIR)) {
+    fs.mkdirSync(VUE_TARGET_DIR, { recursive: true });
+  }
+
+  // Generate deployedContracts.ts for Vue
+  const fileContent = Object.entries(allContractsData).reduce((content, [chainId, chainConfig]) => {
+    return `${content}${parseInt(chainId).toFixed(0)}:${JSON.stringify(chainConfig, null, 2)},`;
+  }, "");
+
+  fs.writeFileSync(
+    `${VUE_TARGET_DIR}deployedContracts.ts`,
+    await prettier.format(
+      `${generatedContractComment}
+export const deployedContracts = {${fileContent}} as const;
+
+export type DeployedContracts = typeof deployedContracts;
+`,
+      { parser: "typescript" },
+    ),
+  );
+
+  console.log(`📝 Updated Vue contract definition file on ${VUE_TARGET_DIR}deployedContracts.ts`);
+}
+
+/**
+ * Generates contract config for Node.js example
+ */
+async function generateNodeJsConfig(allContractsData: Record<string, any>) {
+  if (!fs.existsSync(NODEJS_TARGET_DIR)) {
+    fs.mkdirSync(NODEJS_TARGET_DIR, { recursive: true });
+  }
+
+  // Generate deployedContracts.ts for Node.js
+  const fileContent = Object.entries(allContractsData).reduce((content, [chainId, chainConfig]) => {
+    return `${content}${parseInt(chainId).toFixed(0)}:${JSON.stringify(chainConfig, null, 2)},`;
+  }, "");
+
+  fs.writeFileSync(
+    `${NODEJS_TARGET_DIR}deployedContracts.ts`,
+    await prettier.format(
+      `${generatedContractComment}
+export const deployedContracts = {${fileContent}} as const;
+
+export type DeployedContracts = typeof deployedContracts;
+
+// Helper to get contract for a specific chain
+export function getContract(chainId: number, contractName: string) {
+  const chain = deployedContracts[chainId as keyof typeof deployedContracts];
+  if (!chain) {
+    throw new Error(\`No contracts deployed on chain \${chainId}\`);
+  }
+  const contract = chain[contractName as keyof typeof chain];
+  if (!contract) {
+    throw new Error(\`Contract \${contractName} not found on chain \${chainId}\`);
+  }
+  return contract;
+}
+`,
+      { parser: "typescript" },
+    ),
+  );
+
+  console.log(`📝 Updated Node.js contract definition file on ${NODEJS_TARGET_DIR}deployedContracts.ts`);
+}
+
+/**
  * Generates the TypeScript contract definition file based on the json output of the contract deployment scripts
  * This script should be run last.
  */
 const generateTsAbis = async function () {
   const allContractsData = getContractDataFromDeployments();
 
+  // Generate for Next.js
   const fileContent = Object.entries(allContractsData).reduce((content, [chainId, chainConfig]) => {
     return `${content}${parseInt(chainId).toFixed(0)}:${JSON.stringify(chainConfig, null, 2)},`;
   }, "");
@@ -131,6 +203,14 @@ const generateTsAbis = async function () {
   );
 
   console.log(`📝 Updated TypeScript contract definition file on ${TARGET_DIR}deployedContracts.ts`);
+
+  // Generate for Vue example
+  await generateVueConfig(allContractsData);
+
+  // Generate for Node.js example
+  await generateNodeJsConfig(allContractsData);
+
+  console.log(`✅ All contract definition files generated successfully!`);
 };
 
 export default generateTsAbis;

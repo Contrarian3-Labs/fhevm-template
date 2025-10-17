@@ -7,7 +7,7 @@
  * This is a thin wrapper (~15 lines) that calls the core encrypt action
  */
 
-import { ref, type Ref } from 'vue'
+import { ref, toRaw, type Ref } from 'vue'
 import { encrypt, type EncryptParameters, type EncryptReturnType } from '../actions/encrypt.js'
 import type { FhevmConfig } from '../createConfig.js'
 import { useConfig } from './useConfig.js'
@@ -79,8 +79,15 @@ export function useEncrypt(
     error.value = undefined
 
     try {
+      // CRITICAL: Unwrap Vue Proxy from instance parameter
+      // FhevmInstance has private fields inaccessible through Proxy
+      const rawParams = {
+        ...params,
+        instance: toRaw(params.instance),
+      }
+
       // Call core encrypt action
-      const result = await encrypt(config, params)
+      const result = await encrypt(config, rawParams)
 
       data.value = result
       isLoading.value = false

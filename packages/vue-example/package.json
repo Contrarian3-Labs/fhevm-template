@@ -1,0 +1,27 @@
+{
+  "name": "@fhevm-vue-example",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Vue 3 example demonstrating FHEVM SDK integration with FHE Counter",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview",
+    "type-check": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@fhevm-sdk": "workspace:*",
+    "buffer": "^6.0.3",
+    "ethers": "^6.13.4",
+    "viem": "2.34.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "~18.19.50",
+    "@vitejs/plugin-vue": "^5.0.0",
+    "typescript": "~5.8.2",
+    "vite": "^5.0.0",
+    "vue-tsc": "^2.0.0"
+  }
+}

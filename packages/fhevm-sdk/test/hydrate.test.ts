@@ -344,7 +344,7 @@ describe('hydrate', () => {
       expect(rehydrateSpy).not.toHaveBeenCalled()
     })
 
-    it('should log auto-connect message if autoConnect is enabled', async () => {
+    it('should not log anything in onMount (auto-connect handled by framework adapters)', async () => {
       const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
 
       const config = createFhevmConfig({
@@ -356,9 +356,9 @@ describe('hydrate', () => {
 
       await onMount()
 
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Auto-connect not yet implemented')
-      )
+      // Auto-connect is handled by framework adapters (React/Vue), not core
+      // So no console.log should be called
+      expect(consoleLogSpy).not.toHaveBeenCalled()
 
       consoleLogSpy.mockRestore()
     })

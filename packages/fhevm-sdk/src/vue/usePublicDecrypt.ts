@@ -8,7 +8,7 @@
  * NO signature required - handles must be marked via FHE.makePubliclyDecryptable()
  */
 
-import { ref, type Ref } from 'vue'
+import { ref, toRaw, type Ref } from 'vue'
 import { publicDecrypt, type PublicDecryptParameters, type PublicDecryptReturnType } from '../actions/publicDecrypt.js'
 import type { FhevmConfig } from '../createConfig.js'
 import { useConfig } from './useConfig.js'
@@ -123,8 +123,15 @@ export function usePublicDecrypt(
     error.value = undefined
 
     try {
+      // CRITICAL: Unwrap Vue Proxy from instance parameter
+      // FhevmInstance has private fields inaccessible through Proxy
+      const rawParams = {
+        ...params,
+        instance: toRaw(params.instance),
+      }
+
       // Call core publicDecrypt action
-      const result = await publicDecrypt(config, params)
+      const result = await publicDecrypt(config, rawParams)
 
       data.value = result
       isLoading.value = false

@@ -7,7 +7,7 @@
  * This is a thin wrapper (~15 lines) that calls the core decrypt action
  */
 
-import { ref, type Ref } from 'vue'
+import { ref, toRaw, type Ref } from 'vue'
 import { decrypt, type DecryptParameters, type DecryptReturnType } from '../actions/decrypt.js'
 import type { FhevmConfig } from '../createConfig.js'
 import { useConfig } from './useConfig.js'
@@ -88,8 +88,18 @@ export function useDecrypt(
     error.value = undefined
 
     try {
+      // CRITICAL: Unwrap Vue Proxy from instance, signer, and storage parameters
+      // FhevmInstance and JsonRpcSigner have private fields inaccessible through Proxy
+      // Storage needs to maintain same reference for signature caching
+      const rawParams: DecryptParameters = {
+        ...params,
+        instance: toRaw(params.instance),
+        signer: toRaw(params.signer),
+        storage: params.storage ? toRaw(params.storage) : params.storage,
+      }
+
       // Call core decrypt action
-      const result = await decrypt(config, params)
+      const result = await decrypt(config, rawParams)
 
       data.value = result
       isLoading.value = false

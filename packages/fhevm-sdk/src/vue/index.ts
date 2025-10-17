@@ -59,3 +59,5 @@ export { useFhevmInstance, type UseFhevmInstanceParameters, type UseFhevmInstanc
 export { useEncrypt, type UseEncryptParameters, type UseEncryptReturnType } from './useEncrypt.js'
 export { useDecrypt, type UseDecryptParameters, type UseDecryptReturnType } from './useDecrypt.js'
 export { usePublicDecrypt, type UsePublicDecryptParameters, type UsePublicDecryptReturnType } from './usePublicDecrypt.js'
+export { useFHEEncryption, type UseFHEEncryptionParameters, type UseFHEEncryptionReturnType } from './useFHEEncryption.js'
+export { useInMemoryStorage, provideInMemoryStorage, type UseInMemoryStorageReturnType } from './useInMemoryStorage.js'
