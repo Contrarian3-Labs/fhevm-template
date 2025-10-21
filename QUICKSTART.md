@@ -8,19 +8,27 @@ Get up and running with FHEVM in **less than 3 minutes**! 🚀
 - **pnpm** package manager
 - **MetaMask** browser extension (for React/Vue examples)
 
-## One-Command Setup
+## Two-Terminal Setup
 
-Choose your framework and run a single command:
-
-### Interactive Mode (Choose Your Framework)
+### Terminal 1: Start Hardhat Node
 
 ```bash
-pnpm install
+pnpm install  # First time only
+pnpm chain
+```
+
+Keep this terminal open to see Hardhat logs (blocks, transactions, gas, etc.)
+
+### Terminal 2: Deploy & Start Frontend
+
+**Interactive Mode (Choose Your Framework):**
+
+```bash
 pnpm quick-start
 ```
 
-That's it! The script will:
-1. ✓ Start Hardhat node automatically
+The script will:
+1. ✓ Detect Hardhat node
 2. ✓ Deploy contracts
 3. ✓ Generate type-safe contract interfaces
 4. ✓ Ask which example you want to run
@@ -30,10 +38,12 @@ That's it! The script will:
 
 Or jump straight to your preferred framework:
 
+**Important:** Start Hardhat first in Terminal 1: `pnpm chain`
+
 #### React/Next.js Example
 
 ```bash
-pnpm install
+# Terminal 2
 pnpm quick-start:react
 ```
 
@@ -42,7 +52,7 @@ pnpm quick-start:react
 #### Vue 3 Example
 
 ```bash
-pnpm install
+# Terminal 2
 pnpm quick-start:vue
 ```
 
@@ -51,7 +61,7 @@ pnpm quick-start:vue
 #### Node.js CLI Example
 
 ```bash
-pnpm install
+# Terminal 2
 pnpm quick-start:nodejs
 ```
 
@@ -81,9 +91,9 @@ Each example demonstrates:
 - ✅ **Signature Caching**: Sign once, decrypt multiple times (7-day validity)
 - ✅ **Type-Safe Contracts**: Auto-generated TypeScript interfaces
 
-## Line Count Comparison
+## Setup Comparison
 
-**Traditional Setup**: ~20 steps across multiple terminals
+**Before (Manual Setup)**: ~20 steps
 
 ```bash
 # Terminal 1
@@ -92,8 +102,6 @@ pnpm run node
 
 # Terminal 2
 pnpm deploy:localhost
-
-# Terminal 3
 cd packages/vue-example
 cp .env.example .env
 nano .env  # Manual editing
@@ -103,14 +111,23 @@ pnpm dev
 # Manual MetaMask configuration
 ```
 
-**Quick Start**: **2 commands** ✨
+**After (Quick Start)**: **3 commands** ✨
 
 ```bash
-pnpm install
+# Terminal 1
+pnpm chain
+
+# Terminal 2
 pnpm quick-start
+# Follow prompts...
 ```
 
-**Reduction**: **90% fewer steps!**
+**Benefits**:
+- ✅ See Hardhat logs in real-time (Terminal 1)
+- ✅ Auto-deploy contracts
+- ✅ Auto-generate TypeScript types
+- ✅ Interactive framework selection
+- ✅ Auto-create .env files
 
 ## Troubleshooting
 

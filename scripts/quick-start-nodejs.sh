@@ -7,8 +7,18 @@ cd "$(dirname "$0")/.."
 echo "🚀 FHEVM Node.js CLI Quick Start"
 echo ""
 
-# Start Hardhat node
-bash "$(dirname "$0")/start-hardhat.sh" || exit 1
+# Check if Hardhat is running
+echo "Checking Hardhat node..."
+if ! nc -z localhost 8545 2>/dev/null; then
+    echo "⚠  Hardhat node is not running"
+    echo ""
+    echo "Please start Hardhat in a separate terminal first:"
+    echo "  pnpm chain"
+    echo ""
+    exit 1
+fi
+echo "✓ Hardhat node is running"
+echo ""
 
 # Deploy contracts
 echo "Deploying contracts..."

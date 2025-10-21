@@ -13,13 +13,47 @@ NC='\033[0m' # No Color
 
 echo -e "${BLUE}╔══════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║   FHEVM Template Quick Start            ║${NC}"
-echo -e "${BLUE}║   Get started in < 3 minutes!           ║${NC}"
+echo -e "${BLUE}║   Deploy contracts & start frontend     ║${NC}"
 echo -e "${BLUE}╚══════════════════════════════════════════╝${NC}"
 echo ""
 
-# Start Hardhat node (uses shared script)
-bash "$(dirname "$0")/start-hardhat.sh" || exit 1
-HARDHAT_RUNNING=$?
+# Check if Hardhat is running (don't start it)
+echo -e "${YELLOW}➜${NC} Checking Hardhat node..."
+if ! nc -z localhost 8545 2>/dev/null; then
+    echo -e "${YELLOW}⚠${NC}  Hardhat node is not running on port 8545"
+    echo ""
+    echo -e "${BLUE}Please start Hardhat in a separate terminal:${NC}"
+    echo -e "${GREEN}  pnpm chain${NC}"
+    echo ""
+    echo "This allows you to see Hardhat logs (blocks, transactions, gas, etc.)"
+    echo ""
+    read -p "Press Enter once Hardhat is running..."
+    echo ""
+
+    # Wait for Hardhat to be ready (up to 60 seconds)
+    echo -e "${YELLOW}➜${NC} Waiting for Hardhat to be ready..."
+    READY=0
+    for i in {1..60}; do
+        if nc -z localhost 8545 2>/dev/null; then
+            echo -e "${GREEN}✓${NC} Hardhat node detected!"
+            READY=1
+            break
+        fi
+        sleep 1
+        if [ $((i % 10)) -eq 0 ]; then
+            echo -e "${YELLOW}  ⏳${NC} Still waiting... (${i}s elapsed)"
+        fi
+    done
+
+    if [ $READY -eq 0 ]; then
+        echo -e "${YELLOW}✗${NC} Hardhat still not detected after 60 seconds"
+        echo -e "${YELLOW}  ${NC} Please ensure Hardhat is running: pnpm chain"
+        exit 1
+    fi
+else
+    echo -e "${GREEN}✓${NC} Hardhat node is running on port 8545"
+fi
+echo ""
 
 # Deploy contracts
 echo -e "${YELLOW}➜${NC} Deploying contracts..."
