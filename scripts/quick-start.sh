@@ -17,30 +17,9 @@ echo -e "${BLUE}║   Get started in < 3 minutes!           ║${NC}"
 echo -e "${BLUE}╚══════════════════════════════════════════╝${NC}"
 echo ""
 
-# Check if Hardhat is already running
-HARDHAT_RUNNING=0
-if nc -z localhost 8545 2>/dev/null; then
-    echo -e "${GREEN}✓${NC} Hardhat node already running on port 8545"
-    HARDHAT_RUNNING=1
-else
-    echo -e "${YELLOW}➜${NC} Starting Hardhat node..."
-    pnpm hardhat:chain > /dev/null 2>&1 &
-    HARDHAT_PID=$!
-    echo -e "${GREEN}✓${NC} Hardhat node started (PID: $HARDHAT_PID)"
-
-    # Wait for Hardhat to be ready
-    echo -e "${YELLOW}➜${NC} Waiting for Hardhat to be ready..."
-    for i in {1..30}; do
-        if nc -z localhost 8545 2>/dev/null; then
-            echo -e "${GREEN}✓${NC} Hardhat node is ready!"
-            break
-        fi
-        sleep 1
-        if [ $i -eq 30 ]; then
-            echo -e "${YELLOW}⚠${NC}  Hardhat is taking longer than expected..."
-        fi
-    done
-fi
+# Start Hardhat node (uses shared script)
+bash "$(dirname "$0")/start-hardhat.sh" || exit 1
+HARDHAT_RUNNING=$?
 
 # Deploy contracts
 echo -e "${YELLOW}➜${NC} Deploying contracts..."
@@ -106,8 +85,3 @@ case $choice in
         exit 1
         ;;
 esac
-
-# Cleanup on exit
-if [ $HARDHAT_RUNNING -eq 0 ]; then
-    trap "kill $HARDHAT_PID 2>/dev/null" EXIT
-fi

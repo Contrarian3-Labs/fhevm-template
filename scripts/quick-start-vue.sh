@@ -7,12 +7,8 @@ cd "$(dirname "$0")/.."
 echo "🚀 FHEVM Vue Quick Start"
 echo ""
 
-# Start Hardhat if not running
-if ! nc -z localhost 8545 2>/dev/null; then
-    echo "Starting Hardhat node..."
-    pnpm hardhat:chain > /dev/null 2>&1 &
-    sleep 5
-fi
+# Start Hardhat node
+bash "$(dirname "$0")/start-hardhat.sh" || exit 1
 
 # Deploy contracts
 echo "Deploying contracts..."
