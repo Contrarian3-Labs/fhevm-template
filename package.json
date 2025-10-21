@@ -12,6 +12,10 @@
     ]
   },
   "scripts": {
+    "quick-start": "bash scripts/quick-start.sh",
+    "quick-start:react": "bash scripts/quick-start-react.sh",
+    "quick-start:vue": "bash scripts/quick-start-vue.sh",
+    "quick-start:nodejs": "bash scripts/quick-start-nodejs.sh",
     "chain": "pnpm hardhat:chain",
     "compile": "pnpm hardhat:compile",
     "deploy:localhost": "pnpm hardhat:deploy && pnpm generate",

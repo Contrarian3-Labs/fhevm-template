@@ -30,9 +30,27 @@ A complete Vue 3 example demonstrating the FHEVM SDK with the FHE Counter smart 
 4. **Component Communication**: Props and composables
 5. **Lifecycle Hooks**: `onMounted()`, `watch()`
 
-## Quick Start
+## ⚡ Quick Start (2 Commands)
 
-**Get running in 5 minutes!**
+**Get running in under 1 minute:**
+
+```bash
+# From repository root
+pnpm quick-start:vue
+```
+
+That's it! The script will:
+- ✓ Start Hardhat node
+- ✓ Deploy contracts
+- ✓ Create .env file
+- ✓ Launch Vue app at http://localhost:3001
+
+**MetaMask Setup:**
+- Add Hardhat network (RPC: `http://localhost:8545`, Chain ID: `31337`)
+- Import test account: `0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80`
+
+<details>
+<summary>📖 Manual Setup (5 Steps)</summary>
 
 1. **Start Hardhat Node:**
    ```bash
@@ -51,7 +69,6 @@ A complete Vue 3 example demonstrating the FHEVM SDK with the FHE Counter smart 
    ```bash
    cd packages/vue-example
    cp .env.example .env
-   # Edit .env with contract address from deployment output
    ```
 
 4. **Start Vue App:**
@@ -63,11 +80,10 @@ A complete Vue 3 example demonstrating the FHEVM SDK with the FHE Counter smart 
 5. **Setup MetaMask:**
    - Add Hardhat network (RPC: `http://localhost:8545`, Chain ID: `31337`)
    - Import a test account from Hardhat node output
-   - Connect wallet and start encrypting!
+
+</details>
 
 The app will start at **http://localhost:3001**
-
-📖 **Detailed instructions below** →
 
 ## Prerequisites
 

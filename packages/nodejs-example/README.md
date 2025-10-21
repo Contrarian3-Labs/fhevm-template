@@ -106,6 +106,26 @@ Private Key: 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
 
 Use any of these private keys for testing.
 
+## ⚡ Quick Start (1 Command)
+
+**Get running in under 1 minute:**
+
+```bash
+# From repository root
+pnpm quick-start:nodejs
+```
+
+That's it! The script will:
+- ✓ Start Hardhat node
+- ✓ Deploy contracts
+- ✓ Create .env file with defaults
+- ✓ Launch interactive CLI
+
+No browser needed - pure Node.js! 🚀
+
+<details>
+<summary>📖 Manual Setup</summary>
+
 ## Running the Example
 
 ### Option 1: From Repository Root (Recommended)
@@ -143,6 +163,8 @@ node dist/index.js
 | `pnpm start` | Package | Run from `packages/nodejs-example` |
 | `pnpm build` | Package | Build from `packages/nodejs-example` |
 | `pnpm dev` | Package | Watch mode from `packages/nodejs-example` |
+
+</details>
 
 ### CLI Menu
 

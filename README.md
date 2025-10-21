@@ -24,7 +24,48 @@ Before you begin, ensure you have:
 - **MetaMask** browser extension
 - **Git** for cloning the repository
 
-## 🛠️ Quick Start
+## 🚀 Quick Start (< 3 Minutes)
+
+### Ultra-Fast Setup
+
+Get started with **2 commands**:
+
+```bash
+pnpm install
+pnpm quick-start
+```
+
+Choose your framework (React, Vue, or Node.js) and you're done! 🎉
+
+### Framework-Specific Launch
+
+Jump straight to your preferred framework:
+
+```bash
+# React/Next.js (http://localhost:3000)
+pnpm quick-start:react
+
+# Vue 3 (http://localhost:3001)
+pnpm quick-start:vue
+
+# Node.js CLI (no browser needed)
+pnpm quick-start:nodejs
+```
+
+### What the Quick Start Does
+
+✓ Starts Hardhat node automatically
+✓ Deploys contracts
+✓ Generates TypeScript interfaces
+✓ Sets up environment files
+✓ Launches your chosen example
+
+**That's it!** No multiple terminals, no manual configuration. 🚀
+
+For detailed step-by-step instructions, see [QUICKSTART.md](QUICKSTART.md).
+
+<details>
+<summary>📖 Manual Setup (Advanced Users)</summary>
 
 ### 1. Clone and Setup
 
@@ -82,6 +123,8 @@ pnpm start
    - **RPC URL**: `http://127.0.0.1:8545`
    - **Chain ID**: `31337`
    - **Currency Symbol**: `ETH`
+
+</details>
 
 ### ⚠️ Sepolia Production note
 
