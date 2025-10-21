@@ -218,11 +218,14 @@ export async function decrypt<config extends FhevmConfig>(
     }))
 
     // Call FHEVM userDecrypt - errors propagate naturally (no wrapping)
+    // IMPORTANT: Signature must not have '0x' prefix per Zama's official SDK pattern
+    // Reference: https://docs.zama.ai/fhevm/sdk-guides/user-decryption
+    // ethers.signTypedData() returns signature with '0x' prefix, but userDecrypt() requires it without
     const results = await instance.userDecrypt(
       mutableReqs,
       sig.privateKey,
       sig.publicKey,
-      sig.signature,
+      sig.signature.replace('0x', ''),
       sig.contractAddresses,
       sig.userAddress,
       sig.startTimestamp,
