@@ -27,8 +27,8 @@ if [ "$NODE_VERSION" -lt "$REQUIRED_VERSION" ]; then
     echo -e "${YELLOW}  ${NC} Current version: $(node -v)"
     echo ""
     echo -e "${BLUE}Please upgrade Node.js:${NC}"
-    echo "  • Using nvm: ${GREEN}nvm install 20 && nvm use 20${NC}"
-    echo "  • Or download from: https://nodejs.org/"
+    echo -e "  • Using nvm: ${GREEN}nvm install 20 && nvm use 20${NC}"
+    echo -e "  • Or download from: https://nodejs.org/"
     echo ""
     exit 1
 fi
