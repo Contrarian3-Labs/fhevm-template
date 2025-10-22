@@ -17,6 +17,24 @@ echo -e "${BLUE}║   Deploy contracts & start frontend     ║${NC}"
 echo -e "${BLUE}╚══════════════════════════════════════════╝${NC}"
 echo ""
 
+# Check Node.js version
+echo -e "${YELLOW}➜${NC} Checking Node.js version..."
+NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
+REQUIRED_VERSION=20
+
+if [ "$NODE_VERSION" -lt "$REQUIRED_VERSION" ]; then
+    echo -e "${YELLOW}✗${NC} Node.js version $REQUIRED_VERSION or higher required"
+    echo -e "${YELLOW}  ${NC} Current version: $(node -v)"
+    echo ""
+    echo -e "${BLUE}Please upgrade Node.js:${NC}"
+    echo "  • Using nvm: ${GREEN}nvm install 20 && nvm use 20${NC}"
+    echo "  • Or download from: https://nodejs.org/"
+    echo ""
+    exit 1
+fi
+echo -e "${GREEN}✓${NC} Node.js version $(node -v) is compatible"
+echo ""
+
 # Check if Hardhat is running (don't start it)
 echo -e "${YELLOW}➜${NC} Checking Hardhat node..."
 if ! nc -z localhost 8545 2>/dev/null; then

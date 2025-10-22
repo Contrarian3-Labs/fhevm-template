@@ -7,6 +7,24 @@ cd "$(dirname "$0")/.."
 echo "🚀 FHEVM Node.js CLI Quick Start"
 echo ""
 
+# Check Node.js version
+echo "Checking Node.js version..."
+NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
+REQUIRED_VERSION=20
+
+if [ "$NODE_VERSION" -lt "$REQUIRED_VERSION" ]; then
+    echo "✗ Node.js version $REQUIRED_VERSION or higher required"
+    echo "  Current version: $(node -v)"
+    echo ""
+    echo "Please upgrade Node.js:"
+    echo "  • Using nvm: nvm install 20 && nvm use 20"
+    echo "  • Or download from: https://nodejs.org/"
+    echo ""
+    exit 1
+fi
+echo "✓ Node.js version $(node -v) is compatible"
+echo ""
+
 # Check if Hardhat is running
 echo "Checking Hardhat node..."
 if ! nc -z localhost 8545 2>/dev/null; then
