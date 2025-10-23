@@ -168,7 +168,10 @@ export function EncryptedCounter() {
     if (!instance || !address) return
 
     try {
-      // Encrypt the value 1 (increment by 1)
+      // 🔐 Encryption Process:
+      // Values are encrypted locally and bound to a specific contract/user pair.
+      // This grants the bound contract FHE permissions to receive and process the encrypted value,
+      // but only when it is sent by the bound user.
       const encrypted = await encrypt({
         instance,
         contractAddress: '0x...', // Your contract address

@@ -138,15 +138,15 @@ const encrypted = await encrypt(config, {
 
 ## Where to go next
 
-Go to [**Quick Start (React)**](getting-started/quick-start-react.md) to build your first encrypted dApp with React.
+🟨 Go to [**Quick Start (React)**](getting-started/quick-start-react.md) to build your first encrypted dApp with React.
 
-Go to [**Quick Start (Vue)**](getting-started/quick-start-vue.md) to build your first encrypted dApp with Vue.
+🟨 Go to [**Quick Start (Vue)**](getting-started/quick-start-vue.md) to build your first encrypted dApp with Vue.
 
-Go to [**Quick Start (Vanilla JS)**](getting-started/quick-start-vanilla.md) to use core actions directly.
+🟨 Go to [**Quick Start (Vanilla JS)**](getting-started/quick-start-vanilla.md) to use core actions directly.
 
-Go to [**Architecture Overview**](getting-started/architecture-overview.md) to understand the SDK design.
+🟨 Go to [**Architecture Overview**](getting-started/architecture-overview.md) to understand the SDK design.
 
-Go to [**API Reference**](api-reference/README.md) to explore all available functions and hooks.
+🟨 Go to [**API Reference**](api-reference/README.md) to explore all available functions and hooks.
 
 {% hint style="info" %}
 **New to FHEVM?** We recommend starting with the [Quick Start guide](getting-started/quick-start-react.md) to get hands-on experience before diving into the concepts.
