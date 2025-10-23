@@ -110,11 +110,11 @@ const instance = await createInstance(config, {
 })
 
 const encrypted = await encrypt(config, {
-  instance,
-  contractAddress: '0xYourContract...',
-  userAddress: await signer.getAddress(),
+  instance,                              // FHEVM instance with encryption keys
+  contractAddress: '0xYourContract...',  // Contract that will receive the encrypted value
+  userAddress: await signer.getAddress(), // User who is allowed to submit this value
   values: [
-    { type: 'euint8', value: 42 }
+    { type: 'euint8', value: 42 }        // Value to encrypt (type + plaintext)
   ]
 })
 

@@ -6,6 +6,13 @@ description: Use FHEVM core actions directly with vanilla JavaScript or Node.js.
 
 Use the FHEVM SDK core actions directly without any UI framework.
 
+{% hint style="info" %}
+This guide shows how to use core FHEVM actions directly. Perfect for:
+- Custom frameworks (Svelte, Solid, etc.)
+- Node.js backend applications
+- CLI tools and scripts
+{% endhint %}
+
 ## Installation
 
 ```bash
@@ -29,7 +36,8 @@ const instance = await createInstance(config, {
   chainId: 31337
 })
 
-// Encrypt
+// 🔐 Encryption Process:
+// Values are encrypted locally and bound to a specific contract/user pair.
 const encrypted = await encrypt(config, {
   instance,
   contractAddress: '0x...',

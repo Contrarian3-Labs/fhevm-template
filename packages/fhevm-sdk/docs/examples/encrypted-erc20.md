@@ -6,6 +6,10 @@ description: Build a confidential ERC20 token with encrypted balances.
 
 Build a privacy-preserving ERC20 token where balances and transfers are encrypted. Only token holders can decrypt their own balance.
 
+{% hint style="warning" %}
+**Security Notice:** This example is for educational purposes. Before deploying to production, ensure proper auditing of smart contracts and access control lists (ACL).
+{% endhint %}
+
 ## Overview
 
 This example demonstrates:
@@ -210,7 +214,8 @@ export function EncryptedERC20() {
       // Parse amount (convert to wei)
       const amountWei = ethers.parseEther(amount)
 
-      // Encrypt the amount
+      // 🔐 Encryption Process:
+      // Values are encrypted locally and bound to a specific contract/user pair.
       const encrypted = await encrypt(config, {
         instance,
         contractAddress: TOKEN_ADDRESS as `0x${string}`,
@@ -343,7 +348,8 @@ mapping(address => euint64) private balances;
 Transfer amounts are encrypted end-to-end:
 
 ```typescript
-// Client encrypts amount
+// 🔐 Encryption Process:
+// Client encrypts amount locally
 const encrypted = await encrypt(config, {
   instance,
   contractAddress: TOKEN_ADDRESS,
@@ -423,7 +429,8 @@ Transfer to multiple recipients in one transaction:
 const recipients = ['0xaaa...', '0xbbb...', '0xccc...']
 const amounts = [100n, 200n, 300n]
 
-// Encrypt all amounts at once
+// 🔐 Encryption Process:
+// Encrypt all amounts at once for batch transfer
 const encrypted = await encrypt(config, {
   instance,
   contractAddress: TOKEN_ADDRESS,
@@ -471,6 +478,7 @@ describe('EncryptedERC20', () => {
   it('should transfer encrypted tokens', async () => {
     const [owner, recipient] = await ethers.getSigners()
     
+    // 🔐 Encryption Process:
     // Encrypt transfer amount
     const encrypted = await encrypt(config, {
       instance,

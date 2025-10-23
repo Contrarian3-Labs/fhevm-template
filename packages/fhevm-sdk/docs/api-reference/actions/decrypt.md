@@ -129,15 +129,15 @@ const instance = await createInstance(config, {
 const signer = await provider.getSigner()
 
 const decrypted = await decrypt(config, {
-  instance,
+  instance,                           // FHEVM instance with decryption keys
   requests: [
-    { 
-      handle: '0x1234567890abcdef...', 
-      contractAddress: '0xContractAddress...' 
+    {
+      handle: '0x1234567890abcdef...',     // Encrypted value handle from contract
+      contractAddress: '0xContractAddress...'  // Contract that holds the encrypted value
     }
   ],
-  signer,
-  storage: config.storage
+  signer,                             // User's wallet signer for EIP-712 signature
+  storage: config.storage             // Storage for caching the signature (7 days)
 })
 
 console.log(decrypted['0x1234...']) // 42n (bigint) or true (boolean)
