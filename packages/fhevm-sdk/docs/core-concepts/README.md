@@ -246,9 +246,12 @@ const unsubscribe = config.subscribe((state) => {
 - TypeScript-first
 - Simple API
 
-## See Also
+## Where to go next
 
-- [Architecture Overview](../getting-started/architecture-overview.md)
-- [Getting Started](../getting-started/quick-start-react.md)
-- [API Reference](../api-reference/README.md)
-- [Wagmi Documentation](https://wagmi.sh) - Inspiration for this architecture
+🟨 Go to [**Configuration**](configuration.md) to start building with FHEVM SDK.
+
+🟨 Go to [**Encryption**](encryption.md) to learn how encryption works.
+
+🟨 Go to [**Decryption**](decryption.md) to learn how decryption works.
+
+🟨 Go to [**Quick Start**](../getting-started/quick-start-react.md) for a hands-on tutorial.

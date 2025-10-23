@@ -174,8 +174,10 @@ try {
 - [ ] Test mobile browsers
 - [ ] Set up analytics
 
-## See Also
+## Where to go next
 
-- [Security Best Practices](security-best-practices.md)
-- [Testing Guide](testing.md)
-- [Debugging](debugging.md)
+🟨 Go to [**Security Best Practices**](security-best-practices.md) to ensure your production deployment is secure.
+
+🟨 Go to [**Testing Guide**](testing.md) to validate your application before deployment.
+
+🟨 Go to [**Debugging**](debugging.md) to troubleshoot production issues.

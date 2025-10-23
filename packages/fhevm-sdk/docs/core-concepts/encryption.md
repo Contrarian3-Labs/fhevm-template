@@ -314,9 +314,12 @@ try {
 }
 ```
 
-## See Also
+## Where to go next
 
-- [encrypt() API](../api-reference/actions/encrypt.md)
-- [FHEVM Instance](fhevm-instance.md)
-- [Decryption](decryption.md)
-- [Example: Encrypted Counter](../examples/encrypted-counter.md)
+🟨 Go to [**encrypt() API**](../api-reference/actions/encrypt.md) for complete encryption API reference.
+
+🟨 Go to [**Decryption**](decryption.md) to learn how to decrypt encrypted values.
+
+🟨 Go to [**FHEVM Instance**](fhevm-instance.md) to understand instance creation.
+
+🟨 Go to [**Encrypted Counter Example**](../examples/encrypted-counter.md) to see encryption in action.

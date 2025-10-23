@@ -299,10 +299,12 @@ delete instanceCache[chainId]
 const instance = await createInstance(config, { provider, chainId })
 ```
 
-## See Also
+## Where to go next
 
-- [createInstance() API](../api-reference/actions/createInstance.md)
-- [Configuration](configuration.md)
-- [Encryption](encryption.md)
-- [Decryption](decryption.md)
-- [useFhevm() Hook](../api-reference/react/useFhevm.md)
+🟨 Go to [**createInstance() API**](../api-reference/actions/createInstance.md) for complete instance creation documentation.
+
+🟨 Go to [**Configuration**](configuration.md) to learn about config setup.
+
+🟨 Go to [**Encryption**](encryption.md) to use the instance for encryption.
+
+🟨 Go to [**useFhevm() Hook**](../api-reference/react/useFhevm.md) for React integration.

@@ -515,10 +515,12 @@ Extend this example:
 4. **Batch Operations:** Encrypt multiple operations at once
 5. **Error Recovery:** Add retry logic and better error messages
 
-## See Also
+## Where to go next
 
-- [Encryption API](../api-reference/actions/encrypt.md)
-- [Decryption API](../api-reference/actions/decrypt.md)
-- [React Hook](../api-reference/react/useFhevm.md)
-- [Quick Start - React](../getting-started/quick-start-react.md)
-- [Troubleshooting](../troubleshooting/common-errors.md)
+🟨 Go to [**Encrypted ERC20 Example**](encrypted-erc20.md) to see a more advanced implementation.
+
+🟨 Go to [**Encryption API**](../api-reference/actions/encrypt.md) for detailed encryption documentation.
+
+🟨 Go to [**Decryption API**](../api-reference/actions/decrypt.md) for detailed decryption documentation.
+
+🟨 Go to [**Quick Start - React**](../getting-started/quick-start-react.md) to learn the basics.

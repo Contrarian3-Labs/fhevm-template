@@ -360,9 +360,12 @@ const decrypted = await decrypt(config, {
 })  // ❌ Decryption fails (not Alice's signature)
 ```
 
-## See Also
+## Where to go next
 
-- [decrypt() API](../api-reference/actions/decrypt.md)
-- [Encryption](encryption.md)
-- [Storage](storage.md)
-- [Example: Encrypted Counter](../examples/encrypted-counter.md)
+🟨 Go to [**decrypt() API**](../api-reference/actions/decrypt.md) for complete decryption API reference.
+
+🟨 Go to [**Encryption**](encryption.md) to learn how to encrypt values first.
+
+🟨 Go to [**Storage**](storage.md) to understand signature caching.
+
+🟨 Go to [**Encrypted Counter Example**](../examples/encrypted-counter.md) to see decryption in action.

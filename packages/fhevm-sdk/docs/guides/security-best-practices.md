@@ -430,9 +430,12 @@ For security audits:
 - [ ] Request validation
 - [ ] Error handling without leaks
 
-## See Also
+## Where to go next
 
-- [Testing Guide](testing.md)
-- [Debugging](debugging.md)
-- [Deployment](deployment.md)
-- [Troubleshooting](../troubleshooting/common-errors.md)
+🟨 Go to [**Testing Guide**](testing.md) to write secure tests for your FHEVM application.
+
+🟨 Go to [**Debugging**](debugging.md) to investigate security issues.
+
+🟨 Go to [**Deployment**](deployment.md) to deploy your application securely to production.
+
+🟨 Go to [**Troubleshooting**](../troubleshooting/README.md) for common security-related issues.

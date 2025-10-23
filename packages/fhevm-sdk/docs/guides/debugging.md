@@ -214,8 +214,10 @@ try {
 }
 ```
 
-## See Also
+## Where to go next
 
-- [Security Best Practices](security-best-practices.md)
-- [Testing Guide](testing.md)
-- [Troubleshooting](../troubleshooting/common-errors.md)
+🟨 Go to [**Security Best Practices**](security-best-practices.md) to learn about secure FHEVM application development.
+
+🟨 Go to [**Testing Guide**](testing.md) to write comprehensive tests for your FHEVM application.
+
+🟨 Go to [**Troubleshooting**](../troubleshooting/README.md) for quick solutions to common issues.

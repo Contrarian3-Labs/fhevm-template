@@ -418,9 +418,12 @@ expect(setItemSpy).toHaveBeenCalledWith(
 setItemSpy.mockRestore()
 ```
 
-## See Also
+## Where to go next
 
-- [createStorage() API](../api-reference/core/createStorage.md)
-- [Configuration](configuration.md)
-- [Decryption](decryption.md)
-- [Testing Guide](../guides/testing.md)
+🟨 Go to [**createStorage() API**](../api-reference/core/createStorage.md) for complete storage API reference.
+
+🟨 Go to [**Configuration**](configuration.md) to integrate storage with config.
+
+🟨 Go to [**Decryption**](decryption.md) to understand how signatures are cached.
+
+🟨 Go to [**Testing Guide**](../guides/testing.md) for testing with different storage backends.

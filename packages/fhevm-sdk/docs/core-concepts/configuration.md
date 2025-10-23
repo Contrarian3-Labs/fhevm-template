@@ -265,9 +265,12 @@ onMounted(() => {
 })
 ```
 
-## See Also
+## Where to go next
 
-- [createFhevmConfig() API](../api-reference/core/createFhevmConfig.md)
-- [Storage](storage.md)
-- [FHEVM Instance](fhevm-instance.md)
-- [Architecture Overview](../getting-started/architecture-overview.md)
+🟨 Go to [**createFhevmConfig() API**](../api-reference/core/createFhevmConfig.md) for complete API documentation.
+
+🟨 Go to [**Storage**](storage.md) to learn about signature caching.
+
+🟨 Go to [**FHEVM Instance**](fhevm-instance.md) to understand instance management.
+
+🟨 Go to [**Architecture Overview**](../getting-started/architecture-overview.md) to see how configuration fits in the SDK.

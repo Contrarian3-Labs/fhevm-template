@@ -492,9 +492,12 @@ it('should produce valid encrypted handles', async () => {
 })
 ```
 
-## See Also
+## Where to go next
 
-- [Mock Mode](../core-concepts/mock-mode.md)
-- [CI/CD Setup](../guides/ci-cd.md)
-- [Troubleshooting](../troubleshooting/common-errors.md)
-- [Example: Encrypted Counter](../examples/encrypted-counter.md)
+🟨 Go to [**Encrypted Counter Example**](../examples/encrypted-counter.md) to see complete test examples.
+
+🟨 Go to [**Encrypted ERC20 Example**](../examples/encrypted-erc20.md) to learn advanced testing patterns.
+
+🟨 Go to [**Debugging**](debugging.md) to troubleshoot failing tests.
+
+🟨 Go to [**Troubleshooting**](../troubleshooting/README.md) for common testing issues.

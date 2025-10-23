@@ -534,10 +534,12 @@ Be aware of metadata leakage:
 - Gas usage may leak information
 - Transaction timing visible
 
-## See Also
+## Where to go next
 
-- [Encrypted Counter](encrypted-counter.md) - Simpler example
-- [Encryption API](../api-reference/actions/encrypt.md)
-- [Decryption API](../api-reference/actions/decrypt.md)
-- [Testing Guide](../guides/testing.md)
-- [Security Best Practices](../guides/security.md)
+🟨 Go to [**Encrypted Counter Example**](encrypted-counter.md) if you need a simpler introduction.
+
+🟨 Go to [**Encryption API**](../api-reference/actions/encrypt.md) for advanced encryption patterns.
+
+🟨 Go to [**Decryption API**](../api-reference/actions/decrypt.md) for user decryption details.
+
+🟨 Go to [**Security Best Practices**](../guides/security-best-practices.md) to secure your token implementation.
