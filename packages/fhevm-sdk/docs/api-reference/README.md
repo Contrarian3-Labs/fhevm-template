@@ -20,9 +20,6 @@ import type { FhevmConfig, FhevmInstance } from '@fhevm-sdk/types'
 
 // React adapter
 import { FhevmProvider, useFhevmInstance } from '@fhevm-sdk/react'
-
-// Vue adapter
-import { createFhevmPlugin, useFhevmInstance } from '@fhevm-sdk/vue'
 ```
 
 ## API Sections
@@ -49,18 +46,7 @@ React hooks and components:
 - [`useFhevmInstance()`](react/useFhevmInstance.md) - Get FHEVM instance
 - [`useEncrypt()`](react/useEncrypt.md) - Encryption hook
 - [`useDecrypt()`](react/useDecrypt.md) - Decryption hook
-
-### [Vue](vue/README.md)
-
-Vue composables and plugin:
-- [`createFhevmPlugin()`](vue/FhevmPlugin.md) - Vue plugin
-- [`useFhevmInstance()`](vue/useFhevmInstance.md) - Get FHEVM instance
-- [`useEncrypt()`](vue/useEncrypt.md) - Encryption composable
-- [`useDecrypt()`](vue/useDecrypt.md) - Decryption composable
-
-### [Types](types/README.md)
-
-TypeScript type definitions for all exports.
+- [`usePublicDecrypt()`](react/usePublicDecrypt.md) - Public decryption hook
 
 ## Quick Links
 

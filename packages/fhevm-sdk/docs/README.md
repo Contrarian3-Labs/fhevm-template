@@ -40,9 +40,8 @@ If you've used Wagmi, you'll feel right at home:
 
 ### Multi-Framework Support
 
-{% tabs %}
-{% tab title="React" %}
-```typescript
+::: code-group
+```typescript [React]
 import { FhevmProvider, useFhevmInstance, useEncrypt } from '@fhevm-sdk/react'
 
 function App() {
@@ -69,10 +68,8 @@ function YourComponent() {
   return <button onClick={handleEncrypt}>Encrypt</button>
 }
 ```
-{% endtab %}
 
-{% tab title="Vue" %}
-```typescript
+```typescript [Vue]
 import { createFhevmPlugin, useFhevmInstance, useEncrypt } from '@fhevm-sdk/vue'
 
 // main.ts
@@ -99,11 +96,10 @@ const handleEncrypt = async () => {
   <button @click="handleEncrypt">Encrypt</button>
 </template>
 ```
-{% endtab %}
 
-{% tab title="Vanilla JS" %}
-```typescript
-import { createFhevmConfig, createInstance, encrypt } from '@fhevm-sdk/core'
+```typescript [Vanilla JS]
+import { createFhevmConfig } from '@fhevm-sdk/core'
+import { createInstance, encrypt } from '@fhevm-sdk/actions'
 
 // Create config
 const config = createFhevmConfig({
@@ -124,8 +120,7 @@ const encrypted = await encrypt(config, {
   values: [{ type: 'euint8', value: 42 }]
 })
 ```
-{% endtab %}
-{% endtabs %}
+:::
 
 ### Production-Ready Features
 
@@ -138,19 +133,28 @@ const encrypted = await encrypt(config, {
 
 ## Where to go next
 
-🟨 Go to [**Quick Start (React)**](getting-started/quick-start-react.md) to build your first encrypted dApp with React.
+::: info
+**New to FHEVM?** We recommend starting with the [Quick Start guide](getting-started/quick-start-react.md) to get hands-on experience, then explore the [Learning Path](LEARNING_PATH.md) for structured learning.
+:::
 
-🟨 Go to [**Quick Start (Vue)**](getting-started/quick-start-vue.md) to build your first encrypted dApp with Vue.
+### Get Started
 
-🟨 Go to [**Quick Start (Vanilla JS)**](getting-started/quick-start-vanilla.md) to use core actions directly.
+- 🟨 [**Quick Start (React)**](getting-started/quick-start-react.md) - Build your first encrypted dApp with React
+- 🟨 [**Quick Start (Vue)**](getting-started/quick-start-vue.md) - Build your first encrypted dApp with Vue
+- 🟨 [**Quick Start (Vanilla JS)**](getting-started/quick-start-vanilla.md) - Use core actions directly
 
-🟨 Go to [**Architecture Overview**](getting-started/architecture-overview.md) to understand the SDK design.
+### Learn More
 
-🟨 Go to [**API Reference**](api-reference/README.md) to explore all available functions and hooks.
+- 🟨 [**Learning Path**](LEARNING_PATH.md) - Structured learning from beginner to expert
+- 🟨 [**Architecture Overview**](getting-started/architecture-overview.md) - Understand the SDK design
+- 🟨 [**Core Concepts**](core-concepts/README.md) - Deep dive into FHEVM concepts
 
-{% hint style="info" %}
-**New to FHEVM?** We recommend starting with the [Quick Start guide](getting-started/quick-start-react.md) to get hands-on experience before diving into the concepts.
-{% endhint %}
+### Reference
+
+- 🟨 [**API Reference**](api-reference/README.md) - Explore all available functions and hooks
+- 🟨 [**Examples**](examples/README.md) - Complete working examples
+- 🟨 [**Troubleshooting**](troubleshooting/README.md) - Solutions to common problems
+
 
 ## Features at a Glance
 
@@ -227,9 +231,9 @@ import { createFhevmConfig, useFhevmInstance } from '@fhevm-sdk'
 - **GitHub Issues**: [Report bugs and request features](https://github.com/zama-ai/fhevm-react-template/issues)
 - **Contact**: [hello@zama.ai](mailto:hello@zama.ai)
 
-{% hint style="warning" %}
+::: warning
 **Testnet Only**: The Zama Protocol Testnet is not audited and is not intended for production use. Do not publish any critical or sensitive data.
-{% endhint %}
+:::
 
 ## License
 

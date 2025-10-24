@@ -354,9 +354,13 @@ const config = createFhevmConfig({
 it('should handle insufficient balance', async () => {
   const largeAmount = 999999999n
 
+  // Note: Zama FHEVM uses standard Solidity error handling
   await expect(
     contract.transfer(recipient, encryptedAmount)
-  ).to.be.revertedWith('FHE.req')
+  ).to.be.reverted  // Generic revert check
+
+  // Or with custom error message if contract uses require() with message
+  // await expect(...).to.be.revertedWith('Insufficient balance')
 })
 
 it('should handle invalid handles', async () => {

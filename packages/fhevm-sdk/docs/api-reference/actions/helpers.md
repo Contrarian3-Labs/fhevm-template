@@ -1,141 +1,156 @@
 ---
-description: Helper functions for encryption and contract integration.
+description: Helper functions for encryption type mapping and ABI parameter conversion.
 ---
 
 # Helper Functions
 
-FHEVM SDK provides helper functions to simplify encryption workflows and contract integration.
+Utility functions for working with FHEVM encryption results and contract ABIs.
+
+## Import
+
+```typescript
+import {
+  getEncryptionMethod,
+  toHex,
+  buildParamsFromAbi
+} from '@fhevm-sdk/actions'
+```
 
 ## getEncryptionMethod()
 
-Maps FHEVM encrypted types to RelayerEncryptedInput builder method names.
+Maps FHEVM encrypted types to `RelayerEncryptedInput` builder methods.
 
-### Type Signature
+### Usage
 
 ```typescript
-function getEncryptionMethod(type: string): 
-  | 'addBool'
-  | 'add8'
-  | 'add16'
-  | 'add32'
-  | 'add64'
-  | 'add128'
-  | 'add256'
-  | 'addAddress'
+const method = getEncryptionMethod('euint8')
+console.log(method) // 'add8'
+
+// Use with builder
+const input = instance.createEncryptedInput(contractAddress, userAddress)
+input[method](42) // Calls input.add8(42)
 ```
 
 ### Parameters
 
-- `type` - FHEVM encrypted type (e.g., 'euint8', 'ebool', 'externalEuint32')
-
-### Returns
-
-Builder method name as const string.
-
-### Example
-
 ```typescript
-import { getEncryptionMethod } from '@fhevm-sdk/actions'
-
-const method = getEncryptionMethod('euint8')  // 'add8'
-const method2 = getEncryptionMethod('ebool')  // 'addBool'
-
-// Use with builder
-const input = instance.createEncryptedInput(contractAddr, userAddr)
-input[method](42)  // Calls input.add8(42)
+function getEncryptionMethod(type: string): string
 ```
 
-### Type Mapping
+- **type**: FHEVM encrypted type (e.g., `'euint8'`, `'ebool'`, `'eaddress'`)
+
+### Return Value
+
+Returns the corresponding builder method name as a const string.
+
+### Type Mapping Table
 
 | FHEVM Type | Builder Method | Value Type |
 |------------|----------------|------------|
-| `ebool` | `addBool` | boolean |
-| `euint8` | `add8` | number |
-| `euint16` | `add16` | number |
-| `euint32` | `add32` | number |
-| `euint64` | `add64` | bigint |
-| `euint128` | `add128` | bigint |
-| `euint256` | `add256` | bigint |
-| `eaddress` | `addAddress` | string |
+| `ebool` | `addBool` | `boolean` |
+| `euint8` | `add8` | `number` (0-255) |
+| `euint16` | `add16` | `number` (0-65535) |
+| `euint32` | `add32` | `number` (0-4294967295) |
+| `euint64` | `add64` | `bigint` |
+| `euint128` | `add128` | `bigint` |
+| `euint256` | `add256` | `bigint` |
+| `eaddress` | `addAddress` | `string` (Ethereum address) |
 
-### External Types
+### ABI Prefix Handling
 
-Automatically strips Solidity ABI `external` prefix:
+Automatically strips Solidity ABI prefixes like `'external'`:
 
 ```typescript
-getEncryptionMethod('externalEuint32')  // 'add32'
-getEncryptionMethod('euint32')          // 'add32'
-// Both return same result
+getEncryptionMethod('externalEuint32') // 'add32'
+getEncryptionMethod('euint32')         // 'add32' (same result)
 ```
 
-### Throws
+This ensures compatibility with contract ABIs that use external type markers.
 
-Throws `Error` if type is unknown or unsupported.
+### Errors
+
+Throws `Error` if the type is unknown or unsupported:
 
 ```typescript
 try {
-  getEncryptionMethod('invalid')
+  getEncryptionMethod('invalidType')
 } catch (error) {
   console.error(error.message)
-  // "Unknown encryption type: "invalid" (normalized: "invalid")"
+  // "Unknown encryption type: invalidType..."
 }
 ```
 
+---
+
 ## toHex()
 
-Converts Uint8Array or string to 0x-prefixed hex string for contract calls.
+Converts `Uint8Array` or string to `0x`-prefixed hex string for contract calls.
 
-### Type Signature
+### Usage
+
+```typescript
+// From Uint8Array
+toHex(new Uint8Array([1, 2, 3])) // '0x010203'
+
+// From string
+toHex('abcd')   // '0xabcd'
+toHex('0xabcd') // '0xabcd' (unchanged)
+```
+
+### Parameters
 
 ```typescript
 function toHex(value: Uint8Array | string): `0x${string}`
 ```
 
-### Parameters
+- **value**: `Uint8Array` from encryption result OR hex string (with or without `0x` prefix)
 
-- `value` - Uint8Array from encryption result OR hex string (with or without 0x prefix)
+### Return Value
 
-### Returns
+Returns `0x`-prefixed hex string compatible with ethers.js contract calls.
 
-0x-prefixed hex string compatible with ethers.js contract calls.
-
-### Example
+### Examples
 
 ```typescript
-import { toHex } from '@fhevm-sdk/actions'
-
-// Uint8Array → hex
-toHex(new Uint8Array([1, 2, 3]))  // '0x010203'
-
-// String → hex (adds 0x if missing)
-toHex('abcd')    // '0xabcd'
-toHex('0xabcd')  // '0xabcd' (unchanged)
-```
-
-### Use Cases
-
-#### 1. Converting Encrypted Handles
-
-```typescript
+// Convert encryption result to hex
 const encrypted = await encrypt(config, { ... })
+const handleHex = toHex(encrypted.handles[0])
+const proofHex = toHex(encrypted.inputProof)
 
-// Convert handle to hex for contract call
-const hexHandle = toHex(encrypted.handles[0])
-await contract.setValue(hexHandle)
+// Call contract with hex strings
+await contract.setValue(handleHex, proofHex)
 ```
-
-#### 2. Converting Proofs
 
 ```typescript
-const hexProof = toHex(encrypted.inputProof)
-await contract.setValue(hexHandle, hexProof)
+// Ensure hex prefix
+const address = toHex(userAddress) // Ensures 0x prefix
 ```
+
+---
 
 ## buildParamsFromAbi()
 
-Converts EncryptResult to contract function parameters based on ABI definition.
+Builds contract function parameters from encryption result and ABI definition. Converts `EncryptResult` (Uint8Array handles/proof) to properly typed parameters for ethers.js contract calls.
 
-### Type Signature
+### Usage
+
+```typescript
+const encrypted = await encrypt(config, {
+  instance,
+  contractAddress: contract.address,
+  userAddress,
+  values: [{ type: 'euint8', value: 42 }]
+})
+
+// Convert to contract parameters
+const params = buildParamsFromAbi(encrypted, contractAbi, 'setValue')
+// Returns: ['0x1234...', '0xabcd...']
+
+// Call contract
+await contract.setValue(...params)
+```
+
+### Parameters
 
 ```typescript
 function buildParamsFromAbi(
@@ -145,24 +160,125 @@ function buildParamsFromAbi(
 ): any[]
 ```
 
-### Parameters
+- **enc**: Encryption result from `encrypt()` or `encryptWith()`
+- **abi**: Contract ABI array (standard ethers.js format)
+- **functionName**: Target function name in ABI
 
-- `enc` - Encryption result from `encrypt()` or `encryptWith()`
-- `abi` - Contract ABI array (standard ethers.js format)
-- `functionName` - Target function name in ABI
+### Return Value
 
-### Returns
+Returns array of properly typed parameters for contract call.
 
-Array of properly typed parameters for contract call.
+### Parameter Mapping
 
-### Example
+- **Index 0**: First encrypted handle (usually the encrypted value)
+- **Index 1+**: Input proof (cryptographic proof for verification)
 
-#### Basic Usage
+### Type Conversion
+
+| ABI Parameter Type | Conversion |
+|-------------------|------------|
+| `bytes` / `bytes32` | `Uint8Array → hex string` (via `toHex`) |
+| `uint256` | `Uint8Array → hex string → BigInt` (two-step) |
+| `address` / `string` | Pass through as string |
+| `bool` | Convert to boolean |
+
+### Why uint256 Needs Two-Step Conversion
+
+`BigInt()` cannot directly parse `Uint8Array`. Must convert to hex string first:
 
 ```typescript
-import { encrypt, buildParamsFromAbi } from '@fhevm-sdk/actions'
+// ❌ Wrong: BigInt cannot parse Uint8Array
+BigInt(Uint8Array([1,2,3])) // SyntaxError
 
-// 1. Encrypt value
+// ✅ Correct: Convert to hex first
+BigInt(toHex(Uint8Array([1,2,3]))) // BigInt('0x010203') → 66051n
+```
+
+### Examples
+
+#### bytes32 Parameter
+
+```javascript
+// Contract function: setValue(bytes32 handle, bytes proof)
+```
+
+```typescript
+const params = buildParamsFromAbi(encryptResult, contractAbi, 'setValue')
+// Returns: ['0x1234...', '0xabcd...']
+
+await contract.setValue(...params)
+```
+
+#### uint256 Parameter
+
+```javascript
+// Contract function: setEncrypted(uint256 handle, bytes proof)
+```
+
+```typescript
+const params = buildParamsFromAbi(encryptResult, abi, 'setEncrypted')
+// Returns: [12345678901234567890n, '0xabcd...']
+
+await contract.setEncrypted(...params)
+```
+
+#### Multiple Handles
+
+```typescript
+const encrypted = await encrypt(config, {
+  instance,
+  contractAddress,
+  userAddress,
+  values: [
+    { type: 'euint8', value: 42 },
+    { type: 'ebool', value: true },
+  ]
+})
+
+// For functions with multiple encrypted inputs
+const params = buildParamsFromAbi(encrypted, abi, 'setMultiple')
+// Returns all handles + proof
+```
+
+### Errors
+
+Throws `Error` if function not found in ABI:
+
+```typescript
+try {
+  buildParamsFromAbi(encrypted, abi, 'nonExistentFunction')
+} catch (error) {
+  console.error(error.message)
+  // "Function ABI not found for nonExistentFunction"
+}
+```
+
+### Warnings
+
+For unknown ABI parameter types, logs warning and falls back to hex:
+
+```typescript
+// Unknown type in ABI
+console.warn('Unknown ABI param type customType; passing as hex')
+```
+
+## Complete Example
+
+```typescript
+import { createFhevmConfig } from '@fhevm-sdk/core'
+import {
+  createInstance,
+  encrypt,
+  buildParamsFromAbi,
+  toHex,
+  getEncryptionMethod
+} from '@fhevm-sdk/actions'
+
+// Create config and instance
+const config = createFhevmConfig({ chains: [31337] })
+const instance = await createInstance(config, { provider })
+
+// Encrypt values
 const encrypted = await encrypt(config, {
   instance,
   contractAddress: contract.address,
@@ -170,240 +286,24 @@ const encrypted = await encrypt(config, {
   values: [{ type: 'euint8', value: 42 }]
 })
 
-// 2. Build contract parameters from ABI
-const params = buildParamsFromAbi(
-  encrypted,
-  contractAbi,
-  'setValue'  // Function name
-)
-
-// 3. Call contract
+// Option 1: Use buildParamsFromAbi (recommended)
+const params = buildParamsFromAbi(encrypted, contractAbi, 'setValue')
 await contract.setValue(...params)
-```
 
-#### With Function Signature
-
-```solidity
-// Contract function:
-function setValue(bytes32 handle, bytes memory proof) external
-```
-
-```typescript
-const params = buildParamsFromAbi(encrypted, abi, 'setValue')
-// Returns: ['0x1234...', '0xabcd...']
-
-await contract.setValue(params[0], params[1])
-// Or spread:
-await contract.setValue(...params)
-```
-
-### Type Conversion
-
-The function automatically converts based on ABI type:
-
-| ABI Type | Conversion |
-|----------|------------|
-| `bytes`/`bytes32` | Uint8Array → hex string (via toHex) |
-| `uint256` | Uint8Array → hex → BigInt |
-| `address`/`string` | Pass through as string |
-| `bool` | Convert to boolean |
-
-#### bytes/bytes32 Example
-
-```solidity
-function setValue(bytes32 handle, bytes proof) external
-```
-
-```typescript
-const params = buildParamsFromAbi(encrypted, abi, 'setValue')
-// ['0x1234...', '0xabcd...']
-```
-
-#### uint256 Example
-
-```solidity
-function setValue(uint256 handle, bytes proof) external
-```
-
-```typescript
-const params = buildParamsFromAbi(encrypted, abi, 'setValue')
-// [12345678901234567890n, '0xabcd...']
-```
-
-### Parameter Mapping
-
-- **Index 0:** First encrypted handle (`enc.handles[0]`)
-- **Index 1+:** Input proof (`enc.inputProof`)
-
-```typescript
-const params = buildParamsFromAbi(encrypted, abi, 'setValue')
-// params[0] = encrypted.handles[0] (converted based on ABI)
-// params[1] = encrypted.inputProof (converted based on ABI)
-```
-
-### Throws
-
-Throws `Error` if function not found in ABI:
-
-```typescript
-try {
-  buildParamsFromAbi(encrypted, abi, 'nonexistent')
-} catch (error) {
-  console.error(error.message)
-  // "Function ABI not found for nonexistent"
-}
-```
-
-### Advanced Usage
-
-#### Multiple Handles
-
-For functions that accept multiple handles:
-
-```solidity
-function setValues(
-  bytes32 handle1,
-  bytes32 handle2,
-  bytes proof
-) external
-```
-
-```typescript
-// Encrypt multiple values
-const encrypted = await encrypt(config, {
-  instance,
-  contractAddress,
-  userAddress,
-  values: [
-    { type: 'euint32', value: 100 },
-    { type: 'euint32', value: 200 }
-  ]
-})
-
-// Manual parameter construction
-await contract.setValues(
-  toHex(encrypted.handles[0]),
-  toHex(encrypted.handles[1]),
-  toHex(encrypted.inputProof)
-)
-```
-
-#### Unknown ABI Types
-
-For unknown types, defaults to hex conversion:
-
-```typescript
-// Unknown type in ABI
-const params = buildParamsFromAbi(encrypted, abi, 'customFunction')
-// Converts to hex with warning:
-// console.warn(`Unknown ABI param type ${input.type}; passing as hex`)
-```
-
-## Common Workflows
-
-### Workflow 1: Simple Contract Call
-
-```typescript
-import { encrypt, buildParamsFromAbi } from '@fhevm-sdk/actions'
-
-// Encrypt → Build Params → Call
-const encrypted = await encrypt(config, { ... })
-const params = buildParamsFromAbi(encrypted, abi, 'setValue')
-await contract.setValue(...params)
-```
-
-### Workflow 2: Manual Type Conversion
-
-```typescript
-import { encrypt, toHex } from '@fhevm-sdk/actions'
-
-const encrypted = await encrypt(config, { ... })
-
-// Manual conversion
+// Option 2: Manual conversion with toHex
 const handleHex = toHex(encrypted.handles[0])
 const proofHex = toHex(encrypted.inputProof)
-
-// Call with specific types
 await contract.setValue(handleHex, proofHex)
+
+// Option 3: Check encryption method
+const method = getEncryptionMethod('euint8')
+console.log(`Used method: ${method}`) // 'add8'
 ```
 
-### Workflow 3: Dynamic Type Mapping
+## Where to go next
 
-```typescript
-import { getEncryptionMethod } from '@fhevm-sdk/actions'
+🟨 Go to [**encrypt()**](encrypt.md) to use these helpers with encryption.
 
-function encryptDynamic(type: EncryptionType, value: any) {
-  const method = getEncryptionMethod(type)
-  const input = instance.createEncryptedInput(contractAddr, userAddr)
-  
-  input[method](value)
-  
-  return input.encrypt()
-}
+🟨 Go to [**Actions API**](README.md) for all available actions.
 
-// Use
-const encrypted = await encryptDynamic('euint32', 1000)
-```
-
-## Error Handling
-
-All helpers throw on invalid input:
-
-```typescript
-import { 
-  getEncryptionMethod, 
-  toHex, 
-  buildParamsFromAbi 
-} from '@fhevm-sdk/actions'
-
-try {
-  getEncryptionMethod('invalid')
-} catch (error) {
-  // Handle unknown type
-}
-
-try {
-  buildParamsFromAbi(encrypted, abi, 'nonexistent')
-} catch (error) {
-  // Handle missing function
-}
-
-// toHex never throws (accepts any Uint8Array or string)
-const hex = toHex(anyValue)
-```
-
-## See Also
-
-- [encrypt()](encrypt.md) - Main encryption action
-- [decrypt()](decrypt.md) - Main decryption action
-- [Core Concepts: Encryption](../../core-concepts/encryption.md)
-- [Example: Encrypted Counter](../../examples/encrypted-counter.md)
-
-## Type Definitions
-
-```typescript
-type EncryptionType =
-  | 'ebool'
-  | 'euint8'
-  | 'euint16'
-  | 'euint32'
-  | 'euint64'
-  | 'euint128'
-  | 'euint256'
-  | 'eaddress'
-
-type EncryptResult = {
-  handles: Uint8Array[]
-  inputProof: Uint8Array
-}
-
-function getEncryptionMethod(type: string): string
-
-function toHex(value: Uint8Array | string): `0x${string}`
-
-function buildParamsFromAbi(
-  enc: EncryptResult,
-  abi: any[],
-  functionName: string
-): any[]
-```
+🟨 Go to [**Encryption Guide**](../../core-concepts/encryption.md) for encryption concepts.

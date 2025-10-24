@@ -6,12 +6,12 @@ description: Use FHEVM core actions directly with vanilla JavaScript or Node.js.
 
 Use the FHEVM SDK core actions directly without any UI framework.
 
-{% hint style="info" %}
+::: info
 This guide shows how to use core FHEVM actions directly. Perfect for:
 - Custom frameworks (Svelte, Solid, etc.)
 - Node.js backend applications
 - CLI tools and scripts
-{% endhint %}
+:::
 
 ## Installation
 
@@ -22,7 +22,8 @@ npm install @fhevm-sdk ethers@^6.13.4
 ## Basic Usage
 
 ```typescript
-import { createFhevmConfig, createInstance, encrypt, decrypt } from '@fhevm-sdk/core'
+import { createFhevmConfig } from '@fhevm-sdk/core'
+import { createInstance, encrypt, decrypt } from '@fhevm-sdk/actions'
 import { BrowserProvider } from 'ethers'
 
 // Create config
@@ -78,6 +79,7 @@ const unsubscribe = config.subscribe((state) => {
 
 ## Next Steps
 
-- [Architecture Overview](architecture-overview.md)
-- [Vanilla JS Guide](../framework-guides/vanilla/basic-usage.md)
-- [Core API Reference](../api-reference/core/README.md)
+- [Architecture Overview](architecture-overview.md) - Understand the three-layer design
+- [Core Concepts](../core-concepts/README.md) - Deep dive into FHEVM fundamentals
+- [Actions API Reference](../api-reference/actions/README.md) - Explore all available actions
+- [Core API Reference](../api-reference/core/README.md) - Configuration and state management

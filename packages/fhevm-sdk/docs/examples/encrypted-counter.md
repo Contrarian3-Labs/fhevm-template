@@ -28,36 +28,39 @@ First, create the encrypted counter contract:
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "@fhenixprotocol/contracts/FHE.sol";
-import "@fhenixprotocol/contracts/access/Permissioned.sol";
+import {FHE, euint32, externalEuint32} from "@fhevm/solidity/lib/FHE.sol";
+import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 
-contract EncryptedCounter is Permissioned {
+/// @title FHE Counter - A simple encrypted counter contract
+/// @notice Demonstrates basic FHEVM operations with encrypted state
+contract FHECounter is SepoliaConfig {
     // Encrypted counter for each user
     mapping(address => euint32) private counters;
 
     // Event emitted when counter is incremented
     event CounterIncremented(address indexed user);
 
-    // Increment counter by encrypted amount
-    function increment(bytes calldata encryptedAmount) external {
-        euint32 amount = FHE.asEuint32(encryptedAmount);
+    /// @notice Increment counter by an encrypted amount
+    /// @param inputEuint32 The encrypted input value
+    /// @param inputProof Zero-knowledge proof for the encrypted input
+    function increment(externalEuint32 inputEuint32, bytes calldata inputProof) external {
+        // Convert external encrypted input to internal euint32
+        euint32 amount = FHE.fromExternal(inputEuint32, inputProof);
+
+        // Add encrypted amount to user's counter
         counters[msg.sender] = FHE.add(counters[msg.sender], amount);
+
+        // Grant access control permissions
+        FHE.allowThis(counters[msg.sender]);  // Contract can read
+        FHE.allow(counters[msg.sender], msg.sender);  // User can decrypt
+
         emit CounterIncremented(msg.sender);
     }
 
-    // Get encrypted counter (only owner can decrypt)
-    function getCounter(Permission calldata permission) 
-        external 
-        view 
-        onlyPermitted(permission, msg.sender)
-        returns (bytes memory) 
-    {
-        return FHE.sealoutput(counters[msg.sender], permission.publicKey);
-    }
-
-    // Get encrypted counter as sealed output
-    function getCounterSealed() external view returns (string memory) {
-        return FHE.sealoutputTyped(counters[msg.sender], bytes32(0));
+    /// @notice Get the encrypted counter value for the caller
+    /// @return The encrypted counter value (euint32)
+    function getCounter() external view returns (euint32) {
+        return counters[msg.sender];
     }
 }
 ```
@@ -69,7 +72,7 @@ Create the counter component:
 ```typescript
 // src/components/EncryptedCounter.tsx
 import { useState, useEffect } from 'react'
-import { useFhevm } from '@fhevm-sdk/react'
+import { useFhevmInstance } from '@fhevm-sdk/react'
 import { encrypt, decrypt } from '@fhevm-sdk/actions'
 import { createFhevmConfig } from '@fhevm-sdk/core'
 import { ethers } from 'ethers'
@@ -78,7 +81,10 @@ import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 // Contract ABI
 const COUNTER_ABI = [
   {
-    "inputs": [{"internalType": "bytes", "name": "encryptedAmount", "type": "bytes"}],
+    "inputs": [
+      {"internalType": "externalEuint32", "name": "inputEuint32", "type": "bytes32"},
+      {"internalType": "bytes", "name": "inputProof", "type": "bytes"}
+    ],
     "name": "increment",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -86,14 +92,15 @@ const COUNTER_ABI = [
   },
   {
     "inputs": [],
-    "name": "getCounterSealed",
-    "outputs": [{"internalType": "string", "name": "", "type": "string"}],
+    "name": "getCounter",
+    "outputs": [{"internalType": "euint32", "name": "", "type": "uint256"}],
     "stateMutability": "view",
     "type": "function"
   }
 ]
 
-const CONTRACT_ADDRESS = '0x...' // Your deployed contract
+// TODO: Replace with your deployed contract address after running deployment
+const CONTRACT_ADDRESS = '0x...' as `0x${string}`
 
 // Create FHEVM config
 const config = createFhevmConfig({
@@ -109,11 +116,13 @@ export function EncryptedCounter() {
   const publicClient = usePublicClient()
 
   // FHEVM instance
-  const { instance, status, error } = useFhevm({
+  const { instance, isLoading, isError, error } = useFhevmInstance({
     provider: window.ethereum,
     chainId: 31337,
     enabled: !!address
   })
+
+  const status = isLoading ? 'loading' : isError ? 'error' : instance ? 'ready' : 'idle'
 
   // State
   const [incrementAmount, setIncrementAmount] = useState('1')
@@ -165,8 +174,9 @@ export function EncryptedCounter() {
 
       console.log('Encrypted amount:', encrypted)
 
-      // Call contract
-      const tx = await contract.increment(encrypted.handles[0])
+      // Call contract with encrypted handle and proof
+      // Zama FHEVM requires both the encrypted handle and a zero-knowledge proof
+      const tx = await contract.increment(encrypted.handles[0], encrypted.inputProof)
       console.log('Transaction sent:', tx.hash)
 
       // Wait for confirmation
@@ -189,20 +199,20 @@ export function EncryptedCounter() {
     try {
       setIsDecrypting(true)
 
-      // Get sealed encrypted counter from contract
-      const sealedOutput = await contract.getCounterSealed()
-      console.log('Sealed output:', sealedOutput)
+      // Get encrypted counter handle from contract
+      const encryptedHandle = await contract.getCounter()
+      console.log('Encrypted handle:', encryptedHandle)
 
-      // Extract handle from sealed output (format-specific)
-      // For Fhenix, sealed output format is different
-      // This is a simplified example - actual parsing depends on your FHEVM implementation
-      const handle = sealedOutput // Adjust based on your format
+      // Convert the euint32 to a hex string handle for decryption
+      // The handle is the on-chain reference to the encrypted value
+      const handle = '0x' + encryptedHandle.toString(16).padStart(64, '0')
 
       // Get signer for EIP-712 signature
       const provider = new ethers.BrowserProvider(window.ethereum as any)
       const signer = await provider.getSigner()
 
       // Decrypt the counter value
+      // This requires user to sign an EIP-712 message (cached for 7 days)
       const decrypted = await decrypt(config, {
         instance,
         requests: [{
@@ -218,6 +228,8 @@ export function EncryptedCounter() {
 
       if (typeof value === 'bigint') {
         setDecryptedValue(Number(value))
+      } else if (typeof value === 'number') {
+        setDecryptedValue(value)
       } else {
         console.error('Unexpected decrypted type:', typeof value)
       }
@@ -456,10 +468,11 @@ npm run dev
 ### Decryption Flow
 
 1. User clicks "Decrypt Counter"
-2. Contract returns sealed encrypted handle
-3. User signs EIP-712 message (signature cached for 7 days)
-4. SDK decrypts handle using signature
-5. Plaintext value displayed to user
+2. Contract returns encrypted euint32 handle
+3. Frontend converts handle to hex string format
+4. User signs EIP-712 message (signature cached for 7 days)
+5. SDK decrypts handle using signature and private key
+6. Plaintext value displayed to user
 
 ## Key Concepts
 
@@ -503,7 +516,7 @@ Common errors and solutions:
 
 ### "Invalid handle format"
 
-**Solution:** Ensure contract is returning sealed output correctly
+**Solution:** Ensure contract is returning euint32 handle correctly and conversion to hex is working
 
 ## Next Steps
 
@@ -517,10 +530,10 @@ Extend this example:
 
 ## Where to go next
 
-🟨 Go to [**Encrypted ERC20 Example**](encrypted-erc20.md) to see a more advanced implementation.
-
 🟨 Go to [**Encryption API**](../api-reference/actions/encrypt.md) for detailed encryption documentation.
 
 🟨 Go to [**Decryption API**](../api-reference/actions/decrypt.md) for detailed decryption documentation.
+
+🟨 Go to [**Core Concepts**](../core-concepts/README.md) to understand FHEVM fundamentals.
 
 🟨 Go to [**Quick Start - React**](../getting-started/quick-start-react.md) to learn the basics.

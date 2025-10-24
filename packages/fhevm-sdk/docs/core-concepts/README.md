@@ -248,10 +248,26 @@ const unsubscribe = config.subscribe((state) => {
 
 ## Where to go next
 
-🟨 Go to [**Configuration**](configuration.md) to start building with FHEVM SDK.
+::: tip
+**Ready to dive deeper?** Explore each core concept to master FHEVM SDK.
+:::
 
-🟨 Go to [**Encryption**](encryption.md) to learn how encryption works.
+### Core Concepts
 
-🟨 Go to [**Decryption**](decryption.md) to learn how decryption works.
+🟨 [**Configuration**](configuration.md) - Set up and manage your FHEVM config
 
-🟨 Go to [**Quick Start**](../getting-started/quick-start-react.md) for a hands-on tutorial.
+🟨 [**FHEVM Instance**](fhevm-instance.md) - Understand instance creation and caching
+
+🟨 [**Encryption**](encryption.md) - Learn how encryption works
+
+🟨 [**Decryption**](decryption.md) - Master decryption and signatures
+
+🟨 [**Storage**](storage.md) - Manage persistent state
+
+### Practical Guides
+
+🟨 [**Quick Start**](../getting-started/quick-start-react.md) - Hands-on tutorial
+
+🟨 [**Examples**](../examples/README.md) - Complete working examples
+
+🟨 [**API Reference**](../api-reference/README.md) - Detailed API documentation

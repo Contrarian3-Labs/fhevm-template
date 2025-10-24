@@ -1,0 +1,43 @@
+name: Deploy FHEVM SDK Documentation
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'packages/fhevm-sdk/docs/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'packages/fhevm-sdk/docs/package.json'
+      
+      - name: Install dependencies
+        run: |
+          cd packages/fhevm-sdk/docs
+          npm install
+      
+      - name: Build documentation
+        run: |
+          cd packages/fhevm-sdk/docs
+          npm run build
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./packages/fhevm-sdk/docs/_book
+          cname: fhevm-sdk-docs.example.com  # 可选：如果你有自定义域名
+

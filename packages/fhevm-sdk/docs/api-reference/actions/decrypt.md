@@ -375,21 +375,21 @@ const isValid = /^0x[a-fA-F0-9]{64}$/.test(handle)
 
 ## Notes
 
-{% hint style="info" %}
+::: info
 **Signature Caching:** Signatures are cached for 7 days by default. This reduces wallet prompts and improves UX. Cached signatures are stored in config.storage (default: localStorage).
-{% endhint %}
+:::
 
-{% hint style="warning" %}
+::: warning
 **Handle Format:** Handles must be exactly 66 characters (0x + 64 hex chars). If you get length warnings, check your contract's encrypted handle format.
-{% endhint %}
+:::
 
-{% hint style="success" %}
+::: tip
 **Batch Efficiency:** Decrypting multiple handles in one call shares the signature validation overhead. Always batch when possible.
-{% endhint %}
+:::
 
-{% hint style="info" %}
+::: info
 **Wagmi Pattern:** This action follows Wagmi's error handling pattern - updates config state AND re-throws original error. This enables both reactive UI updates and immediate error handling.
-{% endhint %}
+:::
 
 ## State Updates
 

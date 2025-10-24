@@ -13,13 +13,18 @@ This guide will help you build a simple encrypted counter application with React
 - Basic knowledge of React hooks
 - MetaMask or another Web3 wallet
 
-{% hint style="info" %}
-Don't have a React project yet? Create one with Vite:
+::: info
+**Don't have a React project yet?** Create one with Vite:
 ```bash
 npm create vite@latest my-fhevm-app -- --template react-ts
 cd my-fhevm-app
+npm install
 ```
-{% endhint %}
+:::
+
+::: warning
+**Important:** You'll need a deployed FHEVM smart contract to interact with. See the [deployment guide](../guides/deployment.md) or use the example contract from [fhevm-hardhat-template](https://github.com/zama-ai/fhevm-hardhat-template).
+:::
 
 ## Step 1: Install Dependencies
 
@@ -53,9 +58,9 @@ export const fhevmConfig = createFhevmConfig({
 })
 ```
 
-{% hint style="info" %}
+::: info
 **Mock Chains**: Using mock chains enables faster encryption/decryption during local development without real cryptographic operations.
-{% endhint %}
+:::
 
 ## Step 3: Wrap Your App with FhevmProvider
 
@@ -174,7 +179,7 @@ export function EncryptedCounter() {
       // but only when it is sent by the bound user.
       const encrypted = await encrypt({
         instance,
-        contractAddress: '0x...', // Your contract address
+        contractAddress: '0x...' as `0x${string}`, // TODO: Replace with your deployed contract address
         userAddress: address as `0x${string}`,
         values: [{ type: 'euint8', value: 1 }]
       })
@@ -198,18 +203,20 @@ export function EncryptedCounter() {
       const ethersProvider = new BrowserProvider(provider)
       const signer = await ethersProvider.getSigner()
 
+      // Call decrypt from hook (config already injected by useDecrypt)
       const results = await decrypt({
         instance,
-        signer,
         requests: [{
           handle: encryptedHandle,
-          type: 'euint8',
-          contractAddress: '0x...' as `0x${string}`, // Your contract address
-          userAddress: address as `0x${string}`
-        }]
+          contractAddress: '0x...' as `0x${string}` // TODO: Replace with your deployed contract address
+        }],
+        signer,
+        storage: config.storage
       })
 
-      setCount(Number(results[0]))
+      // Decrypt returns a record mapping handle to value
+      const decryptedValue = results[encryptedHandle]
+      setCount(Number(decryptedValue))
 
     } catch (err) {
       console.error('Decryption failed:', err)
@@ -356,9 +363,9 @@ const results = await decrypt({
 
 Returns array of decrypted values (as bigint, boolean, or string depending on type).
 
-{% hint style="info" %}
+::: info
 **EIP-712 Signature**: The first time you decrypt, you'll be prompted to sign an EIP-712 message. This signature is cached for 7 days, so you won't be prompted again unless it expires.
-{% endhint %}
+:::
 
 ## Encryption Types
 
@@ -381,10 +388,10 @@ Congratulations! You've built your first encrypted dApp with React and FHEVM SDK
 
 **What's next?**
 
-- [Deploy a Smart Contract](../../examples/basic/counter-app.md) - Complete counter example with contract
 - [Architecture Overview](architecture-overview.md) - Understand how the SDK works
-- [API Reference - React](../../api-reference/react/README.md) - Explore all React hooks
-- [Framework Guide - React](../../framework-guides/react/setup.md) - Advanced React patterns
+- [API Reference - React](../api-reference/react/README.md) - Explore all React hooks
+- [Core Concepts](../core-concepts/README.md) - Deep dive into FHEVM SDK concepts
+- [Examples](../examples/encrypted-counter.md) - See more practical examples
 
 ## Troubleshooting
 
@@ -416,15 +423,15 @@ If you see module resolution errors, ensure your `tsconfig.json` has:
 }
 ```
 
-{% hint style="success" %}
+::: tip
 **Need help?** Join our [Discord community](https://discord.com/invite/zama) or check the [Troubleshooting guide](../../troubleshooting/common-errors.md).
-{% endhint %}
+:::
 
 ## Complete Example Repository
 
 For a complete working example, see:
 - [FHEVM React Template](https://github.com/zama-ai/fhevm-react-template/tree/main/packages/nextjs)
-- [Counter Example](../../examples/basic/counter-app.md)
+- [Counter Example](../examples/encrypted-counter.md)
 
 ---
 

@@ -1,138 +1,147 @@
 ---
-description: Vue composables for FHEVM operations.
+description: Vue composables and plugin for FHEVM SDK.
 ---
 
-# Vue API
+# Vue API Reference
 
-Vue adapter provides the same `useFhevm()` composable as React, following Vue 3 Composition API patterns.
+Vue 3 composables and plugin for building encrypted dApps with FHEVM SDK.
 
-## Import Path
+## Overview
+
+The Vue adapter provides a set of composables that integrate seamlessly with Vue 3's Composition API. All composables return reactive refs that automatically update when state changes.
+
+## Plugin
+
+### [createFhevmPlugin()](createFhevmPlugin.md)
+
+Creates a Vue plugin to provide FHEVM configuration to all components.
 
 ```typescript
-import { useFhevm } from '@fhevm-sdk/vue'
-import { encrypt, decrypt } from '@fhevm-sdk/actions'
+import { createFhevmPlugin } from '@fhevm-sdk/vue'
+
+app.use(createFhevmPlugin(config))
 ```
 
-## Composable
+## Composables
 
-- `useFhevm()` - Manage FHEVM instance lifecycle (same API as React)
+### [useFhevmInstance()](useFhevmInstance.md)
 
-## Pattern
+Create and manage FHEVM instance for encryption/decryption operations.
 
-The Vue adapter follows the **composables + actions** pattern:
+```typescript
+const { instance, status, error } = useFhevmInstance({
+  provider: window.ethereum,
+  chainId: 31337
+})
+```
 
-1. **`useFhevm()`** - Manages FHEVM instance (reactive state, auto-refresh, abort control)
-2. **Actions** - Use `encrypt()` and `decrypt()` from `@fhevm-sdk/actions` directly
+### [useEncrypt()](useEncrypt.md)
 
-This keeps Vue concerns (reactivity, lifecycle) separate from business logic (encryption, decryption).
+Encrypt values for FHEVM smart contracts.
+
+```typescript
+const { encrypt } = useEncrypt()
+
+const encrypted = await encrypt({
+  instance: instance.value,
+  contractAddress: '0x...',
+  userAddress: '0x...',
+  values: [{ type: 'euint8', value: 42 }]
+})
+```
+
+### [useDecrypt()](useDecrypt.md)
+
+Decrypt encrypted handles from FHEVM smart contracts.
+
+```typescript
+const { decrypt } = useDecrypt()
+
+const results = await decrypt({
+  instance: instance.value,
+  signer,
+  requests: [{
+    handle: '0x...',
+    type: 'euint8',
+    contractAddress: '0x...',
+    userAddress: '0x...'
+  }]
+})
+```
 
 ## Quick Example
 
-```vue
+```html
 <script setup lang="ts">
-import { useFhevm } from '@fhevm-sdk/vue'
-import { encrypt, decrypt } from '@fhevm-sdk/actions'
-import { createFhevmConfig } from '@fhevm-sdk/core'
 import { ref } from 'vue'
+import { useFhevmInstance, useEncrypt, useDecrypt } from '@fhevm-sdk/vue'
+import { BrowserProvider } from 'ethers'
 
-// 1. Create config (outside component)
-const config = createFhevmConfig({
-  chains: [31337],
-  mockChains: {
-    31337: 'http://localhost:8545'
-  }
-})
-
-// 2. Use in component
-const { instance, status, error, refresh } = useFhevm({
+// Create FHEVM instance
+const { instance, status } = useFhevmInstance({
   provider: window.ethereum,
-  chainId: 31337,
-  enabled: true
+  chainId: 31337
 })
 
+// Get encrypt/decrypt functions
+const { encrypt } = useEncrypt()
+const { decrypt } = useDecrypt()
+
+// Encrypt a value
 const handleEncrypt = async () => {
   if (!instance.value) return
-
-  const encrypted = await encrypt(config, {
+  
+  const encrypted = await encrypt({
     instance: instance.value,
-    contractAddress: '0xContract...',
-    userAddress: await signer.getAddress(),
-    values: [{ type: 'euint8', value: 1 }]
+    contractAddress: '0x...' as `0x${string}`,
+    userAddress: '0x...' as `0x${string}`,
+    values: [{ type: 'euint8', value: 42 }]
   })
-
-  // Use encrypted.handles and encrypted.inputProof
+  
+  console.log('Encrypted:', encrypted)
 }
 
+// Decrypt a handle
 const handleDecrypt = async (handle: string) => {
   if (!instance.value) return
-
-  const decrypted = await decrypt(config, {
+  
+  const provider = new BrowserProvider(window.ethereum)
+  const signer = await provider.getSigner()
+  
+  const results = await decrypt({
     instance: instance.value,
-    requests: [{ handle, contractAddress: '0xContract...' }],
-    signer: await provider.getSigner(),
-    storage: config.storage
+    signer,
+    requests: [{
+      handle,
+      type: 'euint8',
+      contractAddress: '0x...' as `0x${string}`,
+      userAddress: await signer.getAddress() as `0x${string}`
+    }]
   })
-
-  console.log(decrypted[handle])
+  
+  console.log('Decrypted:', results[handle])
 }
 </script>
 
 <template>
-  <div v-if="status === 'loading'">Loading FHEVM...</div>
-  <div v-else-if="error">Error: {{ error.message }}</div>
-  <div v-else-if="status === 'idle'">Connect wallet first</div>
-  <div v-else>
-    <button @click="handleEncrypt" :disabled="status !== 'ready'">
-      Encrypt Value
-    </button>
-    <button @click="handleDecrypt('0x...')" :disabled="status !== 'ready'">
-      Decrypt Value
-    </button>
-    <button @click="refresh">Refresh Instance</button>
+  <div>
+    <p>Status: {{ status }}</p>
+    <button v-if="instance" @click="handleEncrypt">Encrypt</button>
+    <button v-if="instance" @click="handleDecrypt('0x...')">Decrypt</button>
   </div>
 </template>
 ```
 
-## Composable State
+## Features
 
-`useFhevm()` returns reactive refs:
-
-```typescript
-{
-  instance: Ref<FhevmInstance | undefined>  // FHEVM instance when ready
-  status: Ref<'idle' | 'loading' | 'ready' | 'error'>  // Instance state
-  error: Ref<Error | undefined>  // Error if creation failed
-  refresh: () => void  // Manually refresh instance
-}
-```
-
-## Status Lifecycle
-
-```
-idle → User not connected or enabled=false
-  ↓
-loading → Creating FHEVM instance
-  ↓
-ready → Instance created successfully
-  ↓
-error → Instance creation failed
-```
-
-## Why This Pattern?
-
-**Wagmi-inspired separation:**
-- **Vue composable** manages lifecycle and reactivity (what Vue is good at)
-- **Actions** provide framework-agnostic business logic (reusable in React, vanilla JS)
-
-**Benefits:**
-- Easier testing (actions are pure functions)
-- Better code reuse (same encrypt/decrypt in React and Vue)
-- Smaller bundle (one instance manager instead of separate composables)
-- Simpler API (one composable to learn, then use actions)
+- **Reactive:** All returned values are reactive refs
+- **Type-Safe:** Full TypeScript support with type inference
+- **Composable:** Easy to combine with other Vue composables
+- **SSR Compatible:** Works with Nuxt 3 (client-side only)
 
 ## React vs Vue API
 
-The API is **identical** between React and Vue, except:
+The API is similar between React and Vue, with the main difference being Vue's reactive refs:
 
 | Feature | React | Vue |
 |---------|-------|-----|
@@ -145,18 +154,17 @@ The API is **identical** between React and Vue, except:
 
 ```typescript
 // React
-const { instance, status } = useFhevm({ ... })
+const { instance, status } = useFhevmInstance({ ... })
 if (instance) { /* use instance */ }
 
 // Vue
-const { instance, status } = useFhevm({ ... })
+const { instance, status } = useFhevmInstance({ ... })
 if (instance.value) { /* use instance.value */ }
 ```
 
 ## See Also
 
-- [`encrypt()`](../actions/encrypt.md) - Encryption action
-- [`decrypt()`](../actions/decrypt.md) - Decryption action
-- [Getting Started - Vue](../../getting-started/quick-start-vue.md)
-- [React API](../react/README.md) - Same pattern, React version
-- [Actions API](../actions/README.md)
+- [Quick Start - Vue](../../getting-started/quick-start-vue.md)
+- [Core Concepts](../../core-concepts/README.md)
+- [Examples](../../examples/README.md)
+- [React API](../react/README.md) - React version

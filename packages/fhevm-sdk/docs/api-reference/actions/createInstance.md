@@ -325,19 +325,19 @@ Thrown when operation is cancelled via `AbortSignal`.
 
 ## Notes
 
-{% hint style="info" %}
+::: info
 **Instance Creation Time:**
 - Mock chains: ~100ms (no crypto)
 - Production chains: ~2-3 seconds (fetches keys, loads WASM)
-{% endhint %}
+:::
 
-{% hint style="warning" %}
+::: warning
 **SSR Limitation:** Production chains (non-mock) cannot be used in SSR environments because they require `window.relayerSDK`. Use mock chains for SSR/Node.js.
-{% endhint %}
+:::
 
-{% hint style="success" %}
+::: tip
 **Automatic Caching:** Instances are cached per chain ID. You don't need to manually cache instances - the SDK handles this automatically.
-{% endhint %}
+:::
 
 ## State Updates
 

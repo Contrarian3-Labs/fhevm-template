@@ -353,17 +353,17 @@ const encrypted = await encryptWith(config, {
 
 ## Notes
 
-{% hint style="info" %}
+::: info
 **Batch Encryption:** Encrypting multiple values in a single call generates one shared proof, which is more efficient than multiple encrypt() calls.
-{% endhint %}
+:::
 
-{% hint style="warning" %}
+::: warning
 **Value Ranges:** Ensure values fit within type constraints. For example, euint8 only accepts 0-255. Values outside the range will cause encryption to fail.
-{% endhint %}
+:::
 
-{% hint style="success" %}
+::: tip
 **Type Safety:** TypeScript will enforce type constraints at compile time. Use the EncryptionType union for maximum type safety.
-{% endhint %}
+:::
 
 ## See Also
 

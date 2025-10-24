@@ -12,13 +12,13 @@ Build a simple encrypted counter application with Vue 3 and FHEVM SDK.
 - Vue 3 project
 - MetaMask wallet
 
-{% hint style="info" %}
+::: info
 Don't have a Vue 3 project yet? Create one with Vite:
 ```bash
 npm create vite@latest my-fhevm-app -- --template vue-ts
 cd my-fhevm-app
 ```
-{% endhint %}
+:::
 
 ## Step 1: Install Dependencies
 
@@ -62,7 +62,7 @@ app.mount('#app')
 
 Create `src/components/EncryptedCounter.vue`:
 
-```vue
+```html
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useFhevmInstance, useEncrypt, useDecrypt } from '@fhevm-sdk/vue'
@@ -146,8 +146,9 @@ const handleDecrypt = async (handle: string) => {
 
 ## Next Steps
 
-- [Architecture Overview](architecture-overview.md)
-- [Vue API Reference](../api-reference/vue/README.md)
-- [Vue Framework Guide](../framework-guides/vue/setup.md)
+- [Architecture Overview](architecture-overview.md) - Understand the three-layer design
+- [Vue API Reference](../api-reference/vue/README.md) - Explore Vue composables
+- [Core Concepts](../core-concepts/README.md) - Deep dive into FHEVM fundamentals
+- [Examples](../examples/README.md) - See complete working examples
 
 **Need help?** See [Troubleshooting](../troubleshooting/common-errors.md)

@@ -48,9 +48,9 @@ Map of chain ID to RPC URL for mock/local chains. Mock chains enable faster encr
 - **Example:** `{ 31337: 'http://localhost:8545' }`
 - **Default:** `{}`
 
-{% hint style="info" %}
+::: info
 **Mock Chains**: When a chain ID is in `mockChains`, the SDK uses `@fhevm/mock-utils` for instant encryption/decryption. This is 100x faster than real FHEVM operations and perfect for local testing.
-{% endhint %}
+:::
 
 #### `storage` (optional)
 
@@ -352,20 +352,20 @@ Does not throw. Errors are captured in state and accessible via `config.getState
 
 ## Notes
 
-{% hint style="warning" %}
+::: warning
 **Single Config Instance**: Create one config instance per application. Creating multiple configs can lead to inconsistent state.
-{% endhint %}
+:::
 
-{% hint style="info" %}
+::: info
 **Instance Caching**: FHEVM instances are cached per chain ID. The first `createInstance()` call for a chain takes ~2-3 seconds (fetches public keys, loads WASM). Subsequent calls return the cached instance in <10ms.
-{% endhint %}
+:::
 
 ## See Also
 
 - [`createInstance()`](../actions/createInstance.md) - Create FHEVM instance after config setup
 - [`createStorage()`](createStorage.md) - Create custom storage adapter
 - [`FhevmProvider`](../react/FhevmProvider.md) - React provider component
-- [`createFhevmPlugin()`](../vue/FhevmPlugin.md) - Vue plugin
+- [`createFhevmPlugin()`](../vue/createFhevmPlugin.md) - Vue plugin
 - [Core Concepts: Configuration](../../core-concepts/configuration.md)
 - [Architecture Overview](../../getting-started/architecture-overview.md)
 

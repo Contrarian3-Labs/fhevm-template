@@ -38,7 +38,11 @@
     "watch": "tsc -p tsconfig.json --watch",
     "clean": "rm -rf dist",
     "test": "vitest run --coverage",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "docs:install": "cd docs && npm install honkit --save-dev",
+    "docs:build": "cd docs && npx honkit build",
+    "docs:serve": "cd docs && npx honkit serve",
+    "docs:pdf": "cd docs && npx honkit pdf . fhevm-sdk-docs.pdf"
   },
   "dependencies": {
     "idb": "^8.0.3",

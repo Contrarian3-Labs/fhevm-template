@@ -156,53 +156,20 @@ export function useEncrypt() {
 
 See: [React API Reference](../api-reference/react/README.md)
 
-### Vue Adapter
-
-Uses Plugin and composables:
-
-```typescript
-import { createFhevmPlugin, useFhevmInstance, useEncrypt } from '@fhevm-sdk/vue'
-
-// Register plugin
-app.use(createFhevmPlugin(config))
-
-// Use in components
-const { instance } = useFhevmInstance()
-const { encrypt } = useEncrypt()
-```
-
-**Composable implementation (<50 lines):**
-
-```typescript
-import { useConfig } from './useConfig'
-import { encrypt as encryptAction } from '@fhevm-sdk/actions'
-
-export function useEncrypt() {
-  const config = useConfig()
-  
-  const encrypt = (parameters) => {
-    return encryptAction(config, parameters)
-  }
-  
-  return { encrypt }
-}
-```
-
-See: [Vue API Reference](../api-reference/vue/README.md)
-
 ### Vanilla JS
 
 Direct usage of core and actions:
 
 ```typescript
-import { createFhevmConfig, createInstance, encrypt } from '@fhevm-sdk/core'
+import { createFhevmConfig } from '@fhevm-sdk/core'
+import { createInstance, encrypt } from '@fhevm-sdk/actions'
 
 const config = createFhevmConfig({ chains: [31337] })
 const instance = await createInstance(config, { ... })
 const encrypted = await encrypt(config, { ... })
 ```
 
-See: [Vanilla JS Guide](../framework-guides/vanilla/basic-usage.md)
+See: [Quick Start (Vanilla)](quick-start-vanilla.md)
 
 ## Benefits of This Architecture
 
@@ -225,20 +192,17 @@ See: [Vanilla JS Guide](../framework-guides/vanilla/basic-usage.md)
 The SDK uses **subpath exports** for optimal tree-shaking:
 
 ```typescript
-// Core (state + actions)
-import { createFhevmConfig, createInstance } from '@fhevm-sdk/core'
+// Core (config and state management)
+import { createFhevmConfig } from '@fhevm-sdk/core'
 
-// Actions only
-import { encrypt, decrypt } from '@fhevm-sdk/actions'
+// Actions (pure functions)
+import { createInstance, encrypt, decrypt } from '@fhevm-sdk/actions'
 
 // Types only
 import type { FhevmConfig, FhevmInstance } from '@fhevm-sdk/types'
 
 // React adapter
 import { FhevmProvider, useFhevmInstance } from '@fhevm-sdk/react'
-
-// Vue adapter
-import { createFhevmPlugin, useFhevmInstance } from '@fhevm-sdk/vue'
 
 // Default (includes React for backward compatibility)
 import { createFhevmConfig, useFhevmInstance } from '@fhevm-sdk'
@@ -259,7 +223,6 @@ The FHEVM SDK closely follows Wagmi's architecture:
 | State | Zustand vanilla | Zustand vanilla |
 | Actions | `getAccount()`, `switchChain()` | `createInstance()`, `encrypt()` |
 | React | `WagmiProvider`, `useAccount()` | `FhevmProvider`, `useFhevmInstance()` |
-| Vue | `VueQueryPlugin`, `useAccount()` | `createFhevmPlugin()`, `useFhevmInstance()` |
 
 **Why follow Wagmi?**
 
@@ -267,8 +230,6 @@ The FHEVM SDK closely follows Wagmi's architecture:
 - **Familiar patterns**: Developers know how to use it
 - **Best practices**: Separation of concerns, testability, type safety
 - **Framework-agnostic**: Works with any UI framework
-
-See: [Wagmi Comparison](../advanced/wagmi-comparison.md)
 
 ## State Flow
 
@@ -349,13 +310,13 @@ The SDK supports server-side rendering:
 const config = createFhevmConfig({
   chains: [31337],
   ssr: typeof window === 'undefined',
-  storage: typeof window === 'undefined' 
-    ? noopStorage() 
+  storage: typeof window === 'undefined'
+    ? noopStorage()
     : getDefaultStorage()
 })
 ```
 
-See: [SSR with Next.js](../framework-guides/react/ssr-nextjs.md)
+See: [Configuration](../core-concepts/configuration.md#ssr-configuration)
 
 ## Summary
 

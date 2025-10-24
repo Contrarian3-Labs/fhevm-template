@@ -366,17 +366,17 @@ This prevents memory leaks and stale state updates.
 
 ## Notes
 
-{% hint style="info" %}
+::: info
 **Automatic Caching:** FHEVM instances are cached per chain ID. If you create multiple components with `useFhevm()` for the same chain, they share the same instance (no redundant creation).
-{% endhint %}
+:::
 
-{% hint style="warning" %}
+::: warning
 **Provider Must Be Defined:** If `provider` is `undefined`, status will be `idle`. This is common during SSR or before wallet connection. Use `enabled` to control when instance creation should start.
-{% endhint %}
+:::
 
-{% hint style="success" %}
+::: tip
 **Actions Pattern:** Use this hook ONLY for instance management. For encryption/decryption, use the `encrypt()` and `decrypt()` actions from `@fhevm-sdk/actions`. This keeps business logic separate from React concerns.
-{% endhint %}
+:::
 
 ## Internal Implementation
 
