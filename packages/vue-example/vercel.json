@@ -1,0 +1,30 @@
+{
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "buildCommand": "pnpm run build",
+    "outputDirectory": "dist",
+    "framework": "vite",
+    "devCommand": "pnpm run dev",
+    "installCommand": "pnpm install",
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ],
+    "headers": [
+        {
+            "source": "/assets/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"
+                }
+            ]
+        }
+    ],
+    "env": {
+        "VITE_CONTRACT_ADDRESS": "@vite_contract_address",
+        "VITE_RPC_URL": "@vite_rpc_url",
+        "VITE_CHAIN_ID": "@vite_chain_id"
+    }
+}
